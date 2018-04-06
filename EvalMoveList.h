@@ -11,17 +11,18 @@ public:
   void SetMove(Move* m) {em->SetMove(m);};
   float GetEvaluation() const {return em->GetEvaluation();};
   void SetEvaluation(float e) {em->SetEvaluation(e);};
-  int GetMovesToMate() const {return em->GetMovesToMate();};
-  void SetMovesToMate(int moves) {em->SetMovesToMate(moves);};
+  int GetMovesToFinish() const {return em->GetMovesToFinish();};
+  void SetMovesToFinish(int moves) {em->SetMovesToFinish(moves);};
   bool GetStaleMate() const {em->GetStaleMate();};
   void SetStaleMate(bool isStaleMate) {em->SetStaleMate(isStaleMate);};
   EvalMoveList* GetNext() const {return next;};
   void SetNext(EvalMoveList* n) {next = n;};
   void Append(EvalMoveList* n) {if (!next) {next = n;} else {next->Append(n);}};
-  bool IsEmpty() {return true;};
-  bool BetterOrEqual(EvalMove* em) const {return false;};
+  bool IsEmpty() {return GetNMoves() == 0};
+  float Comparison(EvalMove* emv) const {return em->Comparison(emv);;};
   bool ClearFromMove();
   EvalMove* GetEvalMove() const {return em;};
+  int GetNMoves(int previous = 0);
 private:
   EvalMove* em;
   EvalMoveList* next;

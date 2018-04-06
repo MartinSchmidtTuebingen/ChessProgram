@@ -12,13 +12,14 @@ using namespace std;
  * Class ReverseMove
  * Reverse a move using ReverseMove in Position
  * ExecuteMove gives back a ReverseMove
+ * Compare to EvalMoves, function gives back 0.0 at the moment
  */
 
 // (See papers)
 
 //TODO Write class evaluation. This class is doing later the evaluation of the positions. As basis, it only evaluates the material. Later possibilities can be included using suggestions of blog readers. The function evaluation also evaluates possible mates for the side who moves and similar things. 
 
-//NOTE Except being in the deepest branch, there is no need to call "IsChecked" Everytime. Just make a new move tree - if one of the moves includes capturing the king, the complete predecessor move can be removed.
+//NOTE Except being in the deepest branch, there is no need to call "IsChecked" Everytime. Just make a new move tree - if one of the moves includes capturing the king, the complete predecessor move can be removed. However, this is probably not a good idea from the point that the program should be kept simple.
 
 //NOTE The different evaluations will be implemented as classes which inherit from the base class Evaluation. All have only one public element: The function "float EvaluatePosition(const Position *p)"
 

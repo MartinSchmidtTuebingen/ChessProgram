@@ -29,7 +29,7 @@ public:
   bool IsEnPassantPossibleOnFile(short file) const;
   //Return a Piece on a certain field. Return null pointer if there is no piece on the field or the searched field is out of the board
   Piece* GetPieceOnField(short searchedfile, short searchedrank) const;
-  //Checks if the color which is NOT to move in a check
+  //Checks if the color which is NOT to move is checked
   bool IsChecked() const;
   //Checks if the specified color is in a check.
   bool IsChecked(short color);

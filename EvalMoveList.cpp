@@ -23,3 +23,10 @@ bool EvalMoveList::ClearFromMove() {
   }
   em = 0x0;
 }
+
+int EvalMoveList::int GetNMoves(int previous) {
+  if (next)
+    return next->GetNMoves(previous + em ? 1 :0);
+  else 
+    return previous + em ? 1 : 0;
+}

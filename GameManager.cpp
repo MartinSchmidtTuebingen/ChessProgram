@@ -405,18 +405,18 @@ void GameManager::ManageGame(int humancolor) {
       delete m;
       delete em;
       if (pos->GetColorToMove() == humancolor) {
-	m = RequestMove();
-	pos->ExecuteMove(m);
+        m = RequestMove();
+        pos->ExecuteMove(m);
       }
       else {
-	em = game->GiveBestMoveWithEvaluation(pos, GetDepth());
-	em->WriteOut();
-	m = em->GetMove();
-	pos->ExecuteMove(m);
+        em = game->GiveBestMoveWithEvaluation(pos, GetDepth());
+        em->WriteOut();
+        m = em->GetMove();
+        pos->ExecuteMove(m);
       }
       if (em && em->GameOver()) {
-	delete m;
-	m = 0x0;
+        delete m;
+        m = 0x0;
       }
       movenumber++;
     }
