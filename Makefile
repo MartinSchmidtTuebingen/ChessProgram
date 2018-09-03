@@ -1,4 +1,4 @@
-OBJS = Chess.o Piece.o PieceList.o Move.o ReverseMove.o Position.o SupportFunctions.o Evaluation.o Test.o GameManager.o EvalMove.o ChessGame.o EvalMoveList.o
+OBJS = Chess.o Piece.o PieceList.o Move.o ReverseMove.o Position.o SupportFunctions.o Evaluation.o Test.o GameManager.o EvalMove.o ChessGame.o EvalMoveList.o ReverseMoveStack.o 
 
 Chess.out:  $(OBJS)
 	g++ -o Chess.out $(OBJS) 
@@ -21,6 +21,8 @@ Evaluation.o : Evaluation.cpp Evaluation.h Position.h
 EvalMove.o : EvalMove.cpp EvalMove.h
 
 EvalMoveList.o : EvalMoveList.cpp EvalMoveList.h EvalMove.h
+
+ReverseMoveStack.o : ReverseMoveStack.cpp ReverseMoveStack.h 
 
 ChessGame.o : ChessGame.cpp ChessGame.h EvalMove.h Evaluation.h Chess.h EvalMoveList.h Position.h
 
