@@ -18,7 +18,7 @@ public:
   //Getters and Setters
   PieceList* GetNext() const {return next;};
   short GetType() const {p->GetType();};
-  void SetNext(PieceList *nnext) {this->next = nnext;};
+  void SetNext(PieceList *nnext) {next = nnext;};
   Piece* GetPiece() const {return p;};
   bool GetOwner() const {return owner; };
   void SetOwner(bool flag) {owner = flag; if(next) next->SetOwner(flag);}
