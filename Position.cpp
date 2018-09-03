@@ -8,6 +8,7 @@ using namespace std;
 #include "Piece.h"
 #include "PieceList.h"
 #include "Move.h"
+#include "ReverseMove.h"
 
 
 Position::Position(PieceList *white, PieceList *black, short colortomove, bool whitecancastleshort, bool whitecancastlelong, bool blackcancastleshort, bool blackcancastlelong, short enpassantfile) {
@@ -473,15 +474,22 @@ bool Position::KnightCheck(short kingfile, short kingrank) const {
   return false;
 }
 
-bool Position::IsMoveLegal(Move* m) const {
-  cout << "Attention: Legality only checks at the moment if there is a piece on the given field at that it has the right color." << endl;
+bool Position::IsMoveLegal(Move* m){
+  cout << "Attention: Legality only checks at the moment if there is a piece on the start field that has the right color, whether is a piece of the same color on the end field and if the own king is checked after the move" << endl;
   Piece* p = GetPieceOnField(m->GetStartFile(), m->GetStartRank());
-  if (p && p->GetColor() == GetColorToMove()) {
-    return true;
-  }
-  else {
+  Piece* cp = GetPieceOnField(m->GetTargetFile(), m->GetTargetRank());
+  if (!p || p->GetColor() != GetColorToMove())
     return false;
+  else if (cp && p->GetColor() == cp->GetColor())
+    return false;
+  else {
+    ReverseMove* rm = new ReverseMove();
+    ExecuteMove(m, rm);
+    if (IsChecked())
+      return false;
+    RetractMove(rm);
   }
+  return true;
 }
 
 bool Position::IsMovePromotion(Move* m) {
@@ -499,6 +507,8 @@ bool Position::IsMovePromotion(Move* m) {
 }  
 
 void Position::CreatePiece(Piece *p) {
+  if (!p)
+    return;
   SetBoardPointer(p);
   if (p->GetColor() == whiteNumber) {
     if (white) {
@@ -574,7 +584,18 @@ void Position::CapturePiece(Move *m, PieceList *pl) {
   }
 }
 
-void Position::ExecuteMove(Move *m) {
+void Position::RetractMove(ReverseMove* rm) {
+  Piece* movedPiece = GetPieceOnField(rm->GetStartFile(), rm->GetStartRank());
+  SetEnPassantFile(rm->GetEnPassantFile());
+  SetColorCastle(movedPiece->GetColor(),true,rm->GetCastlingShort());
+  SetColorCastle(movedPiece->GetColor(),false,rm->GetCastlingLong());
+  Piece* cp = movedPiece->RetractMove(rm);
+  SetBoardPointer(movedPiece, rm->GetTargetFile(), rm->GetTargetRank());
+  CreatePiece(cp);
+  return;
+}
+
+void Position::ExecuteMove(Move *m, ReverseMove* rm) {
   if (colortomove != whiteNumber && colortomove != blackNumber) {
     cout << "Define Color to Move" << endl;
     return;
@@ -590,10 +611,21 @@ void Position::ExecuteMove(Move *m) {
   if (!m->GetIDofCapturedPiece()) {
     cp = GetPieceOnField(targetfile, targetrank);
       
-    if(cp) 
+    if(cp) {
       m->SetIDofCapturedPiece(cp->GetID());	
+      if (rm) {
+        rm->SetIDofCapturedPiece(cp->GetID());
+        rm->SetTypeofCapturedPiece(cp->GetType());
+      }
+    }
   }
   cp = 0x0;
+  if (rm) {
+    rm->SetFields(targetfile, targetrank, startfile, startrank);
+    rm->SetCastlingShort(CanColorCastle(GetColorToMove(),true));
+    rm->SetCastlingLong(CanColorCastle(GetColorToMove(),false));
+    rm->SetEnPassantFile(GetEnPassantFile());
+  }
   Piece *p = GetPieceOnField(startfile, startrank);
   const short movedpiecetype = p->GetType();
   PieceList *activelist = 0x0;
@@ -659,6 +691,7 @@ void Position::ExecuteMove(Move *m) {
   colortomove = passivecolor;    
   SetBoardPointer(p);
   activelist = 0x0;
+  return;
 }
 
 EvalMoveList* Position::MakeMoveList() const {

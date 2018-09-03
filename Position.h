@@ -4,6 +4,7 @@
 class PieceList;
 class Piece;
 class Move;
+class ReverseMove;
 class Evaluation;
 class Test;
 class EvalMoveList;
@@ -33,7 +34,7 @@ public:
   bool IsChecked() const;
   //Checks if the specified color is in a check.
   bool IsChecked(short color);
-  bool IsMoveLegal(Move* m) const;
+  bool IsMoveLegal(Move* m);
   bool IsMovePromotion(Move* m);
   bool IsLegal() const;
   void DeletePieceOnField(short searchedfile, short searchedrank);
@@ -49,7 +50,8 @@ public:
   //Capturing a Piece. Should not be visible. Declare as private after testing
   void CapturePiece(Move *m, PieceList *pl);
   //Changing the pieces
-  void ExecuteMove(Move *m);
+  void ExecuteMove(Move *m, ReverseMove* rm = 0x0);
+  void RetractMove(ReverseMove* m);
   void WriteOutPosition();
   //Making the list of possible moves in this position
   EvalMoveList* MakeMoveList() const;
