@@ -1,4 +1,4 @@
-OBJS = Chess.o Piece.o PieceList.o Move.o Position.o SupportFunctions.o Evaluation.o Test.o GameManager.o EvalMove.o ChessGame.o EvalMoveList.o
+OBJS = Chess.o Piece.o PieceList.o Move.o ReverseMove.o Position.o SupportFunctions.o Evaluation.o Test.o GameManager.o EvalMove.o ChessGame.o EvalMoveList.o
 
 Chess.out:  $(OBJS)
 	g++ -o Chess.out $(OBJS) 
@@ -7,6 +7,8 @@ SupportFunctions.o : SupportFunctions.cpp SupportFunctions.h
 	g++ -c SupportFunctions.cpp -std=gnu++11	
 	
 Move.o : Move.cpp Move.h Piece.h
+
+ReverseMove.o : ReverseMove.cpp ReverseMove.h Piece.h
 
 Piece.o : Piece.cpp Piece.h Move.h Evaluation.h Chess.h EvalMoveList.h Position.h SupportFunctions.h 
 
