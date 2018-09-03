@@ -4,6 +4,7 @@ using namespace std;
 
 #include "Piece.h"
 #include "Move.h"
+#include "ReverseMove.h"
 #include "Evaluation.h"
 #include "Chess.h"
 #include "SupportFunctions.h"
@@ -82,17 +83,34 @@ void Piece::MovePiece(Move *m) {
   rank = m->GetTargetRank();
   short promotion = m->GetPromotion();
   if (promotion) {
-    if (!(this->type == pawn)) {
+    if (!(type == pawn)) 
       cout << "Error: Only pawns can do a promotion." << endl;
-    }
-    else {
+    else 
       type = promotion;
-      ID = NextID();
-    }
   }
 }
 
-EvalMoveList* Piece::MakeMoveList(const Position* const p) const {
+Piece* Piece::RetractMove(ReverseMove *rm) {
+  SetFile(rm->GetTargetFile());
+  SetRank(rm->GetTargetRank());
+  if (rm->GetPromotion())
+    type = pawn;
+  
+  short type = rm->GetTypeofCapturedPiece();
+  
+  Piece* cp = 0x0;
+  if (type >= king && type <= pawn) {
+    if (rm->GetEnPassantFile() == 0) 
+      cp = new Piece(type,-1 * GetColor(),rm->GetStartFile(), rm->GetStartRank());
+    else 
+      cp = new Piece(pawn,-1 * GetColor(),rm->GetStartFile(), rm->GetStartRank() - GetColor()==whiteNumber ? 1 : -1);
+
+    cp->SetID(rm->GetIDofCapturedPiece());
+  }  
+  return cp;
+}
+
+EvalMoveList* Piece::MakeMoveList(Position* const p) const {
   EvalMoveList* ml = new EvalMoveList();
   if (type == king) {
     for (int i=-1;i<=1;i++) {

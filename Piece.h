@@ -6,6 +6,7 @@ class Move;
 class Test;
 class EvalMoveList;
 class Position;
+class ReverseMove;
 
 const short noPiece = 0;
 const short king = 1;
@@ -25,7 +26,9 @@ public:
   short GetID() const {return ID;};
   short GetType() const {return type;};
   short GetFile() const {return file;};
+  void SetFile(short f) {file = f;};
   short GetRank() const {return rank;};
+  void SetRank(short r) {rank = r;};
   short GetColor() const {return color;};
   //A check if the piece is on a given field
   short IsOnField(short searchedfile, short searchedrank) const;
@@ -35,9 +38,10 @@ public:
   float GetValue(const Evaluation *eval = 0x0) const;
   //Move the piece according to the Move m
   void MovePiece(Move *m);
+  Piece* RetractMove(ReverseMove *rm);
   //Returns a pointer to a list of moves which can be done by this piece
   //MoveTree MakeMoveTree(Position p);
-  EvalMoveList* MakeMoveList(const Position* const p) const;
+  EvalMoveList* MakeMoveList(Position* const p) const;
   void WriteOutPiece();
  
 private:
@@ -52,7 +56,7 @@ private:
   //An ID which is unique in the actual play
   short ID;
   void SetID(short nid) {ID = nid;};
-
+  void SetType(short ty) {type = ty;};
 };
 
 #endif
