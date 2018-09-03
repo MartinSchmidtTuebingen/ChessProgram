@@ -7,11 +7,9 @@ using namespace std;
 #include "Test.h"
 
 //TODO Write the classes and functions needed for the class ChessGame
-/* Class EvalMove
- * Class EvalMoveList
- * Class ReverseMove
- * Reverse a move using ReverseMove in Position
- * ExecuteMove gives back a ReverseMove
+/* Test function Position::IsMoveLegal()
+ * Test ReverseMove including all difficulties (castling, enpassant, promotion)
+ * Close functionality for Piece::MakeEvalMoveList
  * Compare to EvalMoves, function gives back 0.0 at the moment
  */
 
