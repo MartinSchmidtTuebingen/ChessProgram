@@ -1,9 +1,12 @@
 #include "EvalMoveList.h"
 
-EvalMoveList::EvalMoveList(EvalMove* em, EvalMoveList* next, bool owner) {
-  this->em = em;
-  this->next = next;
-  this->owner = owner;
+EvalMoveList::EvalMoveList(EvalMove* evalmove, EvalMoveList* nextevalmove, bool ownerflag) {
+  if (evalmove)
+    em = evalmove;
+  else
+    em = new EvalMove();
+  next = nextevalmove;
+  owner = ownerflag;
 }
 
 EvalMoveList::~EvalMoveList() {

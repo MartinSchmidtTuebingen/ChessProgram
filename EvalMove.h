@@ -7,7 +7,7 @@ class Move;
 
 class EvalMove {
 public:
-  EvalMove(Move* m = 0x0, float evaluation = 0.0, int MovesToFinish = 0, bool stalemate = false, bool owner = true);
+  EvalMove(Move* move = 0x0, float evaluation = 0.0, int MovesToFinish = 0, bool stalemate = false, bool owner = true);
   ~EvalMove();
   Move* GetMove() const { return m;};
   void SetMove(Move* mo) {m = mo;};

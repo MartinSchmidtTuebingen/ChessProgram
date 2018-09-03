@@ -1,8 +1,11 @@
 #include "EvalMove.h"
 #include "Move.h"
 
-EvalMove::EvalMove(Move* m, float evaluation, int MovesToMate, bool stalemate, bool owner) {
-  this->m = m;
+EvalMove::EvalMove(Move* move, float evaluation, int MovesToMate, bool stalemate, bool owner) {
+  if (move)
+    m = move;
+  else
+    m = new Move();
   this->evaluation = evaluation;
   this->MovesToMate = MovesToMate;
   this->stalemate = stalemate;

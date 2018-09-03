@@ -5,7 +5,7 @@
 
 class EvalMoveList {
 public:
-  EvalMoveList(EvalMove* em = 0x0, EvalMoveList* next = 0x0, bool owner = true);
+  EvalMoveList(EvalMove* evalmove = 0x0, EvalMoveList* nextevalmove = 0x0, bool ownerflag = true);
   ~EvalMoveList();
   Move* GetMove() const {return em->GetMove();};
   void SetMove(Move* m) {em->SetMove(m);};

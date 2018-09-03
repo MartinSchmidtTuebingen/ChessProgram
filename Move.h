@@ -6,7 +6,7 @@ class Test;
 class Move {
 public:
   //Konstruktur and Destructor
-  Move(short startfile, short startrank, short targetfile, short targetrank, short idcapturedpiece = 0, short promotion = 0);
+  Move(short startf = 0, short startr = 0, short targetf = 0, short targetr = 0, short id = 0, short prom = 0);
   ~Move();
   short GetStartFile() const { return startfile; };
   short GetStartRank() const { return startrank; };
