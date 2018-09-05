@@ -24,7 +24,7 @@ public:
   void CorrectCastling(short color);
   bool CanColorCastle(short color, bool shortside) const;
   void SetColorCastle(short color, bool shortside, bool flag);
-  bool IsCastlingPossibleFromPosition(short color, bool shortside) const;
+  bool IsCastlingPossibleFromPosition(short color, bool shortside);
   void CorrectEnPassantFile();
   bool EnPassantPossible() const;
   bool IsEnPassantPossibleOnFile(short file) const;
@@ -47,24 +47,23 @@ public:
   void SetUpStartPosition();
   void CreatePiece(Piece *p);
   void CreatePiece(short type, short color, short filenumber, short ranknumber);
-  //Capturing a Piece. Should not be visible. Declare as private after testing
-  void CapturePiece(Move *m, PieceList *pl);
   //Changing the pieces
   void ExecuteMove(Move *m, ReverseMove* rm = 0x0);
   void RetractMove(ReverseMove* m);
   void WriteOutPosition();
   //Making the list of possible moves in this position
   EvalMoveList* MakeMoveList() const;
+protected:
+  //Capturing a Piece. Should not be visible. Declare as private after testing
+  void CapturePiece(Move* m, ReverseMove* rm = 0x0);
+  void DisplacePiece(Move* m);
 private:
   friend class Test;
   PieceList *white;
   PieceList *black;
-  Piece* *board; 
+  Piece** board; 
   short colortomove;
-  bool whitecancastleshort;
-  bool whitecancastlelong;
-  bool blackcancastleshort;
-  bool blackcancastlelong;
+  bool castlingallowed[4];
   short enpassantfile;
 };
 

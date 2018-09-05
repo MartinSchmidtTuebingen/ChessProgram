@@ -109,6 +109,7 @@ void Test::TestPositionFunctions() {
   cout << "Black Rook on c3." << endl;
   cout << "Black Bishop on d4." << endl << endl;
   cout << "ANY Mentioning of castling or en passant is wrong!" << endl;
+  
   cout << endl << "Moving the white queen from d1 to b3" << endl;
   Move *m = new Move(4,1,2,3);
   pos->ExecuteMove(m);
@@ -133,7 +134,6 @@ void Test::TestPositionFunctions() {
   
   cout << endl << "Test Position: Test castling" << endl;
   pos = new Position(0x0,0x0,1,true,true,true,true);
-  cout << pos->CanColorCastle(1,true);
   pos->CreatePiece(1,1,5,1);
   pos->CreatePiece(3,1,1,1);
   pos->CreatePiece(1,-1,5,8);
@@ -143,6 +143,7 @@ void Test::TestPositionFunctions() {
   Move *whitelongcastling = new Move(5,1,3,1);
   Move *blackshortcastling = new Move(5,8,7,8);
   pos->ExecuteMove(whitelongcastling);
+  pos->WriteOutPosition();
   pos->ExecuteMove(blackshortcastling);
   pos->WriteOutPosition();
   delete pos;
@@ -152,7 +153,7 @@ void Test::TestPositionFunctions() {
   delete blackshortcastling;
   blackshortcastling = 0x0;
   cout << endl << "Test Position: Test disallowing of castling if moving the rooks" << endl;
-  pos = new Position();
+  pos = new Position(0x0,0x0,1,true,true,true,true);
   pos->CreatePiece(1,1,5,1);
   pos->CreatePiece(3,1,1,1);
   pos->CreatePiece(1,-1,5,8);
@@ -292,15 +293,23 @@ void Test::TestPositionFunctions() {
   pos = new Position(0x0,0x0,1,true,true,true,true,0);
   pos->CreatePiece(king,whiteNumber,5,1);
   pos->CreatePiece(rook,whiteNumber,1,1);
+  pos->CreatePiece(bishop,whiteNumber,4,5);
   pos->CreatePiece(king,blackNumber,5,8);
   pos->CreatePiece(rook,blackNumber,8,8);
   pos->WriteOutPosition();
   m = new Move(5,1,3,1);
   ReverseMove* rm = new ReverseMove();
   pos->ExecuteMove(m,rm);
+  
+  cout << "Move finished" << endl;
   pos->WriteOutPosition();
   pos->RetractMove(rm);
+  
+  cout << "ReMove finished" << endl;
   pos->WriteOutPosition();
+  
+  delete pos;
+  pos = 0x0;
  
   cout << endl << "Test Position: End Test Reversed Move" << endl << endl;
   

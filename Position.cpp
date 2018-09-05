@@ -21,10 +21,10 @@ Position::Position(PieceList *white, PieceList *black, short colortomove, bool w
   SetBoardPointer(white);
   SetBoardPointer(black);
   this->colortomove = colortomove;
-  this->whitecancastleshort = whitecancastleshort;
-  this->whitecancastlelong = whitecancastlelong;
-  this->blackcancastleshort = blackcancastleshort;
-  this->blackcancastlelong = blackcancastlelong;
+  castlingallowed[0] = whitecancastleshort;
+  castlingallowed[1] = whitecancastlelong;
+  castlingallowed[2] = blackcancastleshort;
+  castlingallowed[3] = blackcancastlelong;
 //   CorrectCastling(whiteNumber);
 //   CorrectCastling(blackNumber);
   this->enpassantfile = enpassantfile;
@@ -41,6 +41,9 @@ Position::~Position() {
     black->SetOwner(true);
   }
   delete black;
+  for (int i=0;i<(MaxFile * MaxRank);i++) {
+    board[i] = 0x0;
+  }
   delete board;
   board = 0x0;
 }
@@ -57,7 +60,9 @@ void Position::SetColorToMove(short color) {
 
 void Position::SetUpStartPosition() {
   colortomove = whiteNumber;
-  whitecancastlelong = whitecancastleshort = blackcancastlelong = blackcancastleshort = true;
+  for (short i=0;i<4;i++)
+    castlingallowed[i]=true;
+  
   enpassantfile = 0;
   delete board;
   board = new Piece*[MaxFile * MaxRank]; 
@@ -96,14 +101,29 @@ void Position::SetBoardPointer(PieceList *pl) {
 }
 
 void Position::SetBoardPointer(Piece *p, short file, short rank) {
-  if (p && !file && !rank) {
+  
+  if (!p && (!file || !rank))
+    return;
+  
+//   cout << "SetBoardPointer: Before setting file and rank" << endl;
+  if (!file || !rank) {
     file = p->GetFile();
     rank = p->GetRank();
   }
+  else if (p) {
+    p->SetFile(file);
+    p->SetRank(rank);
+  }
+//   cout << "SetBoardPointer: Before setting pointer" << endl;
+  
   if (!board) {
     board = new Piece*[MaxFile * MaxRank];
+    for (int i=0;i<(MaxFile * MaxRank);i++) {
+      board[i] = 0x0;
+    }
   }
   board[(file - 1) * MaxFile + (rank -1)] = p;
+  return;
 }
 
 void Position::CorrectCastling(short color) {
@@ -122,67 +142,78 @@ void Position::CorrectCastling(short color) {
 }
 
 bool Position::CanColorCastle(short color, bool shortside) const {
-  if (color == whiteNumber) {
-    if (shortside) {
-      return whitecancastleshort;
-    }
-    else {
-      return whitecancastlelong;
-    }
-  }
-  if (color == blackNumber) {
-    if (shortside) {
-      return blackcancastleshort;
-    }
-    else {
-      return blackcancastlelong;
-    }
-  }
-  return false;
+  return castlingallowed[(color==whiteNumber ? 0 : 2) + (shortside ? 0 : 1)];
 }
 
 void Position::SetColorCastle(short color, bool shortside, bool flag) {
-  if (color == whiteNumber) {
-    if (shortside) {
-      whitecancastleshort = flag;
-    }
-    else {
-      whitecancastlelong = flag;
-    }
-  }
-  else {
-    if (shortside) {
-      blackcancastleshort = flag;
-    }
-    else {
-      blackcancastlelong = flag;
-    }
-  }
+  castlingallowed[(color==whiteNumber ? 0 : 2) + (shortside ? 0 : 1)] = flag;
+  return;
 }
 
-bool Position::IsCastlingPossibleFromPosition(short color, bool shortside) const {
-  short BackRank = 0;
+bool Position::IsCastlingPossibleFromPosition(short color, bool shortside) {
+  short BackRank = color==whiteNumber ? 1 : MaxRank;
+  short kingMiddleField = shortside ? 6 : 4;
+  short kingTargetField = shortside ? 7 :3;
   short RookFile = shortside ? MaxFile : 1;
-  if (color == whiteNumber) {
-    BackRank = 1;
-  }
-  if (color == blackNumber) {
-    BackRank = MaxRank;
-  }
-  
+
   Piece* possibleKing = GetPieceOnField(5,BackRank);
   if (!possibleKing)
     return false;
+  
+  if (color==whiteNumber)
+    cout << "Läuft1" << endl;
   
   Piece *possibleRook = GetPieceOnField(RookFile, BackRank);
   if (!possibleRook)
     return false;
   
-  if (possibleKing->GetType() == king && possibleKing->GetColor() == color 
-   && possibleRook->GetType() == rook && possibleRook->GetColor() == color)
-    return true;
   
-  return false;
+  if (color==whiteNumber)
+    cout << "Läuft" << endl;
+  
+  if (!(possibleKing->GetType() == king && possibleKing->GetColor() == color 
+   && possibleRook->GetType() == rook && possibleRook->GetColor() == color))
+    return false;
+  if (color==whiteNumber)
+    cout << "Läuft" << endl;
+  
+  if (GetPieceOnField(kingMiddleField,BackRank) || GetPieceOnField(kingTargetField,BackRank))
+    return false;
+  if (color==whiteNumber)
+    cout << "Läuft" << endl;
+
+  if (!shortside && GetPieceOnField(2,BackRank))
+    return false;
+  if (color==whiteNumber)
+    cout << "Läuft" << endl;
+  
+  if (IsChecked(color))
+    return false;
+  if (color==whiteNumber)
+    cout << "Läuft" << endl;
+  
+  if (color==whiteNumber)
+    cout << "Läuft" << endl;
+  
+  Move* m = new Move(5,BackRank,kingMiddleField,BackRank);
+  DisplacePiece(m);
+  if (IsChecked()) {
+    m = new Move(kingMiddleField,BackRank,5,BackRank);
+    DisplacePiece(m);
+  if (color==whiteNumber)
+    cout << "Läuft" << endl;
+    return false;
+  }
+  else {
+    m = new Move(kingMiddleField,BackRank,kingTargetField,BackRank);
+    DisplacePiece(m);
+    bool check = IsChecked(color);
+    m = new Move(kingTargetField,BackRank,5,BackRank);
+    DisplacePiece(m);
+  if (color==whiteNumber)
+    cout << check << endl;
+    return !check;
+  }
 }
 
 void Position::CorrectEnPassantFile() {
@@ -208,26 +239,17 @@ bool Position::IsEnPassantPossibleOnFile(short file) const {
   if (!enpassantfile)
     return false;
   
-  short rank;
-  if (colortomove == whiteNumber) {
-    rank = 5;
-  }
-  if (colortomove == blackNumber) {
-    rank = 4;
-  }
+  short rank = GetColorToMove()==whiteNumber ? 5 : 4;
 
   Piece* pawnToBeTaken = GetPieceOnField(file, rank);
-  if (!pawnToBeTaken || !(pawnToBeTaken->GetType() == pawn) || pawnToBeTaken->GetColor() == colortomove)
+  if (!pawnToBeTaken || !(pawnToBeTaken->GetType() == pawn) || pawnToBeTaken->GetColor() == GetColorToMove())
     return false;
   
   Piece* possibleLeftPawn = GetPieceOnField(file-1, rank);
   Piece* possibleRightPawn = GetPieceOnField(file+1, rank);
   
-  if (!(possibleLeftPawn && possibleLeftPawn->GetType() == pawn && possibleLeftPawn->GetColor() == colortomove) 
-  || (possibleRightPawn && possibleRightPawn->GetType() == pawn && possibleRightPawn->GetColor() == colortomove)) {
-    return false;
-  }
-  return true;
+  return (possibleLeftPawn && possibleLeftPawn->GetType() == pawn && possibleLeftPawn->GetColor() == GetColorToMove()) 
+  || (possibleRightPawn && possibleRightPawn->GetType() == pawn && possibleRightPawn->GetColor() == GetColorToMove());
 }  
 
 Piece* Position::GetPieceOnField(short searchedfile, short searchedrank) const {
@@ -239,12 +261,11 @@ Piece* Position::GetPieceOnField(short searchedfile, short searchedrank) const {
 
 void Position::DeletePieceOnField(short searchedfile, short searchedrank) {
   Piece *p = GetPieceOnField(searchedfile, searchedrank);
-  if (p->GetColor() == whiteNumber) {
-    white->DeletePiece(p->GetID());
-  }
-  if (p->GetColor() == blackNumber) {
-    black->DeletePiece(p->GetID());
-  }
+  if (!p)
+    return;
+
+  PieceList* activelist = p->GetColor()==whiteNumber ? white : black;
+  activelist->DeletePiece(p->GetID());
   SetBoardPointer(0x0, searchedfile, searchedrank);
 }
 
@@ -255,17 +276,9 @@ bool Position::IsLegal() const {
 
 bool Position::IsChecked(short color) {
   short old = GetColorToMove();
-  bool result = false;
-  if (color == whiteNumber) {
-    SetColorToMove(blackNumber);
-    result = IsChecked();
-    SetColorToMove(old);
-  }
-  else if (color == blackNumber) {
-    SetColorToMove(whiteNumber);
-    result = IsChecked();
-    SetColorToMove(old);
-  }
+  SetColorToMove(-color);
+  bool result = IsChecked();
+  SetColorToMove(old);
   return result;
 }
 
@@ -273,28 +286,26 @@ bool Position::IsChecked() const {
   if (!white || !black) {
     return false;
   }
-  Piece *p = 0x0;
-  if (colortomove == whiteNumber) {
-    p = black->GetKing();
-  }
-  if (colortomove == blackNumber) {
-    p = white->GetKing();
-  }
-  if (!p)
+  Piece *k = GetColorToMove()==whiteNumber ? black->GetKing() : white->GetKing();
+  
+  if (!k)
     return false;
   
-  const short kingfile = p->GetFile();
-  const short kingrank = p->GetRank();
-  p = 0x0;
+  const short kingfile = k->GetFile();
+  const short kingrank = k->GetRank();
+  k = 0x0;
  
+//   cout << "Check diagonal check" << endl;
   //Check check from the diagonals
   if (DiagonalCheck(kingfile,kingrank))
     return true;   
   
+//   cout << "Check line check" << endl;
   //Check check from lines
   if (LineCheck(kingfile,kingrank)) 
     return true;
-    
+   
+//   cout << "Check knight check: " << KnightCheck(kingfile,kingrank) << endl;
   //Check Knightcheck
   if (KnightCheck(kingfile,kingrank)) 
     return true;
@@ -395,12 +406,10 @@ bool Position::LineCheck(short kingfile, short kingrank) const {
     if(!p) 
       continue;
 
-    if (p->GetColor() == colortomove && CheckLineCheck(p->GetType(),i-kingfile)) {
+    if (p->GetColor() == colortomove && CheckLineCheck(p->GetType(),i-kingfile)) 
       return true;
-    }
-    else {
+    else 
       break;
-    }
   }
   for (int i=kingfile-1;i>=1;i--) {
     p = GetPieceOnField(i, kingrank);
@@ -408,12 +417,10 @@ bool Position::LineCheck(short kingfile, short kingrank) const {
     if(!p) 
       continue;
      
-    if (p->GetColor() == colortomove && CheckLineCheck(p->GetType(),kingfile-i)) {
+    if (p->GetColor() == colortomove && CheckLineCheck(p->GetType(),kingfile-i)) 
       return true;
-    }
-    else {
+    else 
       break;
-    }
   }
   for (int i=kingrank+1;i<=MaxRank;i++) {
     p = GetPieceOnField(kingfile, i);
@@ -421,12 +428,10 @@ bool Position::LineCheck(short kingfile, short kingrank) const {
     if(!p) 
       continue;
 
-    if (p->GetColor() == colortomove && CheckLineCheck(p->GetType(),i-kingrank)) {
+    if (p->GetColor() == colortomove && CheckLineCheck(p->GetType(),i-kingrank))
       return true;
-    }
-    else {
+    else 
       break;
-    }
   }
   for (int i=kingrank-1;i>=1;i--) {
     p = GetPieceOnField(kingfile, i);
@@ -434,41 +439,27 @@ bool Position::LineCheck(short kingfile, short kingrank) const {
     if(!p) 
       continue;
 
-    if (p->GetColor() == colortomove && CheckLineCheck(p->GetType(),kingrank-i)) {
+    if (p->GetColor() == colortomove && CheckLineCheck(p->GetType(),kingrank-i))
       return true;
-    }
-    else {
+    else 
       break;
-    }
   }
   return false;
 }
 
 bool Position::CheckLineCheck(short opponenttype, short distance) const {
-  if (opponenttype == king && distance == 1)
-    return true;
-  if (opponenttype == rook || opponenttype == queen)
-    return true;
-  return false;  
+  return (opponenttype == king && distance == 1) || (opponenttype == rook || opponenttype == queen);
 }
 
 
 bool Position::KnightCheck(short kingfile, short kingrank) const {
-  const Piece *p = 0x0;
-  short file,rank;
   for (int i=-2;i<=2;i++) {
     for (int j=-2;j<=2;j++) {
       if ((abs(i)+abs(j)) != 3)
-	continue;
+        continue;
       
-      file = kingfile+i;
-      rank = kingrank+j;
-      
-      p = GetPieceOnField(file,rank);
-      if(p) {
-	if (p->GetColor() == colortomove || p->GetType() == knight)
-	  return true;
-      }
+      Piece* p = GetPieceOnField(kingfile+i,kingrank+j);
+      return (p && (p->GetColor() == colortomove || p->GetType() == knight));
     }
   }
   return false;
@@ -493,17 +484,9 @@ bool Position::IsMoveLegal(Move* m){
 }
 
 bool Position::IsMovePromotion(Move* m) {
-  short otherbackrank = 0;
-  if (colortomove == whiteNumber)
-    otherbackrank = MaxRank;
-  if (colortomove == blackNumber)
-    otherbackrank = 1;
-  
+  short otherbackrank = GetColorToMove()==whiteNumber ? MaxRank : 1;
   Piece* possiblepawn = GetPieceOnField(m->GetStartFile(), m->GetStartRank());
-  if (possiblepawn && possiblepawn->GetType() == pawn && m->GetTargetRank() == otherbackrank)
-    return true;
-  else
-    return false;
+  return (possiblepawn && possiblepawn->GetType() == pawn && m->GetTargetRank() == otherbackrank);
 }  
 
 void Position::CreatePiece(Piece *p) {
@@ -511,78 +494,87 @@ void Position::CreatePiece(Piece *p) {
     return;
   SetBoardPointer(p);
   if (p->GetColor() == whiteNumber) {
-    if (white) {
+    if (white) 
       white->CreatePiece(p);
-    }
-    else {
+    else 
       white = new PieceList(p);
-    }
   }
   else {
-    if (black) {
+    if (black) 
       black->CreatePiece(p);
-    }
-    else {
+    else 
       black = new PieceList(p);
-    }
   }
 }
 
 void Position::CreatePiece(short type, short color, short filenumber, short ranknumber) {
   Piece *p = new Piece(type,color,filenumber,ranknumber);
-  SetBoardPointer(p);
-  if (color == whiteNumber) {
-    if (white) {
-      white->CreatePiece(p);
-    }
-    else {
-      white = new PieceList(p);
-    }
-  }
-  else {
-    if (black) {
-      black->CreatePiece(p);
-    }
-    else {
-      black = new PieceList(p);
-    }
-  }
+  CreatePiece(p);
 }
 
-void Position::CapturePiece(Move *m, PieceList *pl) {
-  short ID = m->GetIDofCapturedPiece();
-  //Test if a piece has been taken. If yes, proceed
-  if (ID) {
-    //Test, if already the first element of the list is captured. If, then set the appropriate list pointer (white or black) to the next element of the list, delete the first element and set the temporary pointer plexamined to the nullpointer. Furthermore, the appropriate pointer on the board has to be set to zero Then: method is finished
-    if (pl->IsPiece(ID)) {
-      PieceList *newpl = pl->GetNext();
-      delete pl;
-      pl = newpl;
-      newpl = 0x0;
-    }
-    else {
-      //If it is not the first element, than we have to enter a loop. First, we have to define the previous element. We need this so that we can connect the next element (after the captured one) to the previous
-      PieceList *previous;
-      previous = pl;
-      bool captured = false;                    //Loop variable
-      //The Loop runs until the piece has been captured. We should only enter the loop if the move generating functions has found an appropriate piece. Therefore, if the loop runs until the last pointer, the segmentation fault is an error because wrong written method there
-      while (!captured) {
-	pl = previous->GetNext();
-	if (!pl) cout << "Error: No piece to capture." << endl;   //Only for testing. Should be removed later.
-	if (pl->IsPiece(ID)) {
-	  previous->SetNext(pl->GetNext());	  
-	  delete pl;
-	  pl = 0x0;
-	  captured = true;
-	}
-	else {
-	  previous = pl;
-	}
-      }
-      previous = 0x0;
-    }
-  }
+void Position::DisplacePiece(Move *m) {
+  if (!m)
+    return;
+  
+  short startfile = m->GetStartFile();
+  short startrank = m->GetStartRank();
+  
+  Piece* p = GetPieceOnField(startfile, startrank);
+  if (!p)
+    return;
+
+  p->MovePiece(m);
+  SetBoardPointer(p);
+  SetBoardPointer(0x0,startfile,startrank);
 }
+  
+
+void Position::CapturePiece(Move *m, ReverseMove* rm) {
+  if (!m)
+    return;
+  
+  short targetfile=m->GetTargetFile();
+  short targetrank=m->GetTargetRank();
+  
+  PieceList *passivelist = GetColorToMove()==whiteNumber ? black : white;
+  short enpassantrank = GetColorToMove()==whiteNumber ? 5 : 4;
+  short targetrankforenpassant = enpassantrank + GetColorToMove();
+  
+  Piece* cp = 0x0;
+  if (m->GetIDofCapturedPiece()) {
+    cp = passivelist->FindPiece(m->GetIDofCapturedPiece());
+    if (!cp)
+      cout << "Warning: Given ID for captured piece, no piece found with this ID" << endl;
+  }
+  
+  if (!cp)
+    cp = GetPieceOnField(targetfile,targetrank);
+  
+  if (!cp) {
+    //Find possible e.p.
+    Piece* p = GetPieceOnField(m->GetStartFile(),m->GetStartRank());
+    short movedpiecetype = p->GetType();
+    if ((targetfile==enpassantfile) && (movedpiecetype==pawn) && (targetrank==targetrankforenpassant)) 
+      cp = GetPieceOnField(targetfile,enpassantrank);
+    p = 0x0;
+  }
+  
+  if (!cp) 
+    return;
+  
+  m->SetIDofCapturedPiece(cp->GetID());
+  if (rm) {
+    rm->SetIDofCapturedPiece(cp->GetID());
+    rm->SetTypeofCapturedPiece(cp->GetType());
+  }
+  
+  SetBoardPointer(0x0,cp->GetFile(),cp->GetRank());
+  passivelist->SetOwner(true);
+  passivelist->DeletePiece(m);
+  passivelist->SetOwner(false);
+  return;
+}
+  
 
 void Position::RetractMove(ReverseMove* rm) {
   if (!rm)
@@ -605,44 +597,45 @@ void Position::RetractMove(ReverseMove* rm) {
     Piece* r = GetPieceOnField(rookstartfile,rm->GetStartRank());
     if (r && r->GetType()==rook && r->GetColor() == movedPiece->GetColor()) {
       Move* rookmove = new Move(rookstartfile,rm->GetStartRank(),rooktargetfile,rm->GetStartRank());
-      r->MovePiece(rookmove);
-      SetBoardPointer(r);
+      DisplacePiece(rookmove);
     }
   }
-  CreatePiece(cp);
+  if (cp)
+    CreatePiece(cp);
   SetColorToMove(movedPiece->GetColor());
   return;
 }
 
 void Position::ExecuteMove(Move* m, ReverseMove* rm) {
-  if (colortomove != whiteNumber && colortomove != blackNumber) {
+  if (GetColorToMove() != whiteNumber && GetColorToMove() != blackNumber) {
     cout << "Define Color to Move" << endl;
+    delete rm;
+    rm = 0x0;
     return;
   }
-  if (!m)
+  if (!m) {
+    delete rm;
+    rm = 0x0;
     return;
+  }
   
+  short groundrank = GetColorToMove()==whiteNumber ? 1 : MaxRank;
   const short startfile = m->GetStartFile();
   const short startrank = m->GetStartRank();
   const short targetfile = m->GetTargetFile();
   const short targetrank = m->GetTargetRank();
+  cout << GetField(startfile,startrank) << "-" << GetField(targetfile,targetrank) << endl; 
   Piece *p = GetPieceOnField(startfile, startrank);
+  if (!p) {
+    cout << "Error: No Piece to move" << endl;
+    delete rm;
+    rm = 0x0;
+    return;
+  }
+  
   if (p->GetColor() != GetColorToMove()) 
     cout << "Warning: Wrong color to move" << endl;
-  
-  Piece* cp = 0x0;
-  if (!m->GetIDofCapturedPiece()) {
-    cp = GetPieceOnField(targetfile, targetrank);
-      
-    if(cp) {
-      m->SetIDofCapturedPiece(cp->GetID());	
-      if (rm) {
-        rm->SetIDofCapturedPiece(cp->GetID());
-        rm->SetTypeofCapturedPiece(cp->GetType());
-      }
-    }
-  }
-  cp = 0x0;
+
   if (rm) {
     rm->SetFields(targetfile, targetrank, startfile, startrank);
     rm->SetCastlingShort(CanColorCastle(GetColorToMove(),true));
@@ -650,44 +643,21 @@ void Position::ExecuteMove(Move* m, ReverseMove* rm) {
     rm->SetEnPassantFile(GetEnPassantFile());
   }
   const short movedpiecetype = p->GetType();
-  PieceList *activelist = 0x0;
-  PieceList *passivelist = 0x0;
-  short passivecolor, groundrank, enpassantrank, targetrankforenpassant;
-  if (colortomove == whiteNumber) {
-    activelist = white;
-    passivelist = black;
-    passivecolor = blackNumber;
-    groundrank = 1;
-    enpassantrank = 5;
-    targetrankforenpassant = 6;
-  }
-  else {
-    activelist = black;
-    passivelist = white;
-    passivecolor = whiteNumber;
-    groundrank = 8;
-    enpassantrank = 4;
-    targetrankforenpassant = 3;
-  }
-  activelist->MovePiece(m);
-  if (enpassantfile && (movedpiecetype == pawn) && (targetfile == enpassantfile) && (targetrank == targetrankforenpassant)) {
-    cp = GetPieceOnField(targetfile, enpassantrank);
-    m->SetIDofCapturedPiece(cp->GetID());
-    //If the pawn has been taken en passant, the Board Pointer has to be set here to 0
-    SetBoardPointer(0x0, enpassantfile, enpassantrank);
-  }
-  cp = 0x0;
-  passivelist->SetOwner(true);
-  passivelist->DeletePiece(m);
-  passivelist->SetOwner(false);
+  
+  PieceList *activelist = GetColorToMove()==whiteNumber ? white : black;
   if ((movedpiecetype == king) && (startfile == 5) && (startrank == groundrank) && (targetfile == 3 || targetfile == 7)) {
     short rookstartfile = targetfile==3 ? 1 : 8;
     short rooktargetfile = targetfile==3 ? 4 : 6;
+    
+    if ((rookstartfile==1 && !IsCastlingPossibleFromPosition(colortomove,false)) || rookstartfile==8 && !IsCastlingPossibleFromPosition(colortomove,true)) {
+      cout << "Warning: Cannot castle in this position" << endl;
+      delete rm;
+      rm = 0x0;
+      return;
+    }
+    
     if ((rookstartfile==1 && !CanColorCastle(colortomove,false)) || rookstartfile==8 && !CanColorCastle(colortomove,true))
       cout << "Warning: Castling not allowed" << endl;
-    
-    SetColorCastle(colortomove,true,false);
-    SetColorCastle(colortomove,false,false);
     
     Piece *r = GetPieceOnField(rookstartfile,groundrank);
     if (r) {
@@ -696,44 +666,48 @@ void Position::ExecuteMove(Move* m, ReverseMove* rm) {
       }
       else {
         Move *rookcastlemove = new Move(rookstartfile,groundrank,rooktargetfile,groundrank);
-        activelist->MovePiece(rookcastlemove);
-        SetBoardPointer(r);     
+        DisplacePiece(rookcastlemove);  
       }
     }
   }
-  if ((movedpiecetype == rook) && (startfile == 8) && (startrank == groundrank)) {
+  
+  CapturePiece(m,rm);
+  DisplacePiece(m);
+  
+  if (movedpiecetype == king) {
     SetColorCastle(colortomove,true,false);
-  }
-  if ((movedpiecetype == rook) && (startfile == 1) && (startrank == groundrank)) {
     SetColorCastle(colortomove,false,false);
   }
+  
+  if ((movedpiecetype == rook) && (startrank == groundrank) && ((startfile == 1) || (startfile == MaxFile)))
+    SetColorCastle(GetColorToMove(),startfile==1 ? false : true,false);
+  
   enpassantfile = 0;
-  if ((movedpiecetype == pawn) && (abs(targetrank - startrank) == 2)) {
+  if ((movedpiecetype == pawn) && (abs(targetrank - startrank) == 2) && startrank == groundrank + GetColorToMove()) {
     enpassantfile = targetfile;
   }      
-  colortomove = passivecolor;    
-  SetBoardPointer(p);
+  SetColorToMove(-GetColorToMove());    
   activelist = 0x0;
   return;
 }
 
 EvalMoveList* Position::MakeMoveList() const {
-  if (colortomove == whiteNumber) {
-    return white->MakeMoveList(this);
-  }
-  if (colortomove == blackNumber) {
-    return black->MakeMoveList(this);
-  }
+  PieceList* activelist = GetColorToMove()==whiteNumber ? white : black;
+  delete activelist;
+  activelist->MakeMoveList(this);
 }
 
 void Position::WriteOutPosition() {
+  bool check = IsChecked(GetColorToMove());
+  bool castlings[4];
+  for (short i=0;i<2;i++) {
+    for (short j=0;j<2;j++) 
+      castlings[2*i+j]=IsCastlingPossibleFromPosition(i==0 ? whiteNumber : blackNumber,j==0);
+  }
+  bool enpassantallowed=enpassantfile && IsEnPassantPossibleOnFile(enpassantfile);  
+  
   cout << endl << "Summary of the position:" << endl;
-  if (colortomove == whiteNumber) {
-    cout << "It is whites turn." << endl;
-  }
-  else {
-    cout << "It is blacks turn." << endl;
-  }
+  cout << "It is " << (GetColorToMove()==whiteNumber ? "whites" : "blacks") << " turn." << endl;
   cout << "White Pieces:" << endl;
   if (white)
     white->WriteOutPieces();
@@ -744,29 +718,21 @@ void Position::WriteOutPosition() {
     black->WriteOutPieces();
   else 
     cout << "No white pieces." << endl;
-  bool check = IsChecked(colortomove);
-  if (check) {
-    if (GetColorToMove() == whiteNumber) {
-      cout << "White is checked." << endl;
-    }
-    else if (GetColorToMove() == blackNumber) {
-      cout << "Black is checked." << endl;
-    }
-  }
-  if (whitecancastleshort && IsCastlingPossibleFromPosition(1,true)) 
-    cout << "White can castle short." << endl;
-  if (whitecancastlelong && IsCastlingPossibleFromPosition(1,false))
-    cout << "White can castle long." << endl;
-  if (blackcancastleshort && IsCastlingPossibleFromPosition(-1,true))
-    cout << "Black can castle short." << endl;
-  if (blackcancastlelong && IsCastlingPossibleFromPosition(-1,false))
-    cout << "Black can castle long." << endl;
-  if (enpassantfile && IsEnPassantPossibleOnFile(enpassantfile)) {
-    if (colortomove == whiteNumber) {
-      cout << "The pawn on " << GetField(enpassantfile, 5) << " could be taken en passant." << endl;
-    }
-    else {
-      cout << "The pawn on " << GetField(enpassantfile, 4) << " could be taken en passant." << endl;
+  
+  if (check) 
+    cout << (GetColorToMove()==whiteNumber ? "White" : "Black") << " is checked." << endl;
+  
+  for (short i=0;i<2;i++) {
+    for (short j=0;j<2;j++) {
+      if (CanColorCastle(i==0 ? whiteNumber : blackNumber,j==0)) {
+        cout << (i==0 ? "White" : "Black") << " is allowed to castle " << (j==0 ? "short" : "long"); 
+        if (castlings[2*i+j])
+          cout << " and can in this position";
+        cout << "." << endl;
+      }
     }
   }
+  
+  if (enpassantallowed) 
+    cout << "The pawn on " << GetField(enpassantfile, GetColorToMove()==whiteNumber ? 5 : 4) << " could be taken en passant." << endl;
 }
