@@ -297,14 +297,14 @@ void Test::TestPositionFunctions() {
   pos->CreatePiece(king,blackNumber,5,8);
   pos->CreatePiece(rook,blackNumber,8,8);
   pos->WriteOutPosition();
+  
   m = new Move(5,1,3,1);
   ReverseMove* rm = new ReverseMove();
   pos->ExecuteMove(m,rm);
-  
   cout << "Move finished" << endl;
   pos->WriteOutPosition();
-  pos->RetractMove(rm);
   
+  pos->RetractMove(rm);
   cout << "ReMove finished" << endl;
   pos->WriteOutPosition();
   

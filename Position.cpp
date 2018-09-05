@@ -105,7 +105,6 @@ void Position::SetBoardPointer(Piece *p, short file, short rank) {
   if (!p && (!file || !rank))
     return;
   
-//   cout << "SetBoardPointer: Before setting file and rank" << endl;
   if (!file || !rank) {
     file = p->GetFile();
     rank = p->GetRank();
@@ -114,7 +113,6 @@ void Position::SetBoardPointer(Piece *p, short file, short rank) {
     p->SetFile(file);
     p->SetRank(rank);
   }
-//   cout << "SetBoardPointer: Before setting pointer" << endl;
   
   if (!board) {
     board = new Piece*[MaxFile * MaxRank];
@@ -160,48 +158,28 @@ bool Position::IsCastlingPossibleFromPosition(short color, bool shortside) {
   if (!possibleKing)
     return false;
   
-  if (color==whiteNumber)
-    cout << "Läuft1" << endl;
-  
   Piece *possibleRook = GetPieceOnField(RookFile, BackRank);
   if (!possibleRook)
     return false;
-  
-  
-  if (color==whiteNumber)
-    cout << "Läuft" << endl;
-  
+
   if (!(possibleKing->GetType() == king && possibleKing->GetColor() == color 
    && possibleRook->GetType() == rook && possibleRook->GetColor() == color))
     return false;
-  if (color==whiteNumber)
-    cout << "Läuft" << endl;
-  
+
   if (GetPieceOnField(kingMiddleField,BackRank) || GetPieceOnField(kingTargetField,BackRank))
     return false;
-  if (color==whiteNumber)
-    cout << "Läuft" << endl;
-
+  
   if (!shortside && GetPieceOnField(2,BackRank))
     return false;
-  if (color==whiteNumber)
-    cout << "Läuft" << endl;
-  
+
   if (IsChecked(color))
     return false;
-  if (color==whiteNumber)
-    cout << "Läuft" << endl;
-  
-  if (color==whiteNumber)
-    cout << "Läuft" << endl;
-  
+
   Move* m = new Move(5,BackRank,kingMiddleField,BackRank);
   DisplacePiece(m);
   if (IsChecked()) {
     m = new Move(kingMiddleField,BackRank,5,BackRank);
     DisplacePiece(m);
-  if (color==whiteNumber)
-    cout << "Läuft" << endl;
     return false;
   }
   else {
@@ -210,8 +188,6 @@ bool Position::IsCastlingPossibleFromPosition(short color, bool shortside) {
     bool check = IsChecked(color);
     m = new Move(kingTargetField,BackRank,5,BackRank);
     DisplacePiece(m);
-  if (color==whiteNumber)
-    cout << check << endl;
     return !check;
   }
 }
@@ -294,18 +270,15 @@ bool Position::IsChecked() const {
   const short kingfile = k->GetFile();
   const short kingrank = k->GetRank();
   k = 0x0;
- 
-//   cout << "Check diagonal check" << endl;
+
   //Check check from the diagonals
   if (DiagonalCheck(kingfile,kingrank))
     return true;   
-  
-//   cout << "Check line check" << endl;
+
   //Check check from lines
   if (LineCheck(kingfile,kingrank)) 
     return true;
-   
-//   cout << "Check knight check: " << KnightCheck(kingfile,kingrank) << endl;
+
   //Check Knightcheck
   if (KnightCheck(kingfile,kingrank)) 
     return true;
@@ -590,7 +563,10 @@ void Position::RetractMove(ReverseMove* rm) {
   SetColorCastle(movedPiece->GetColor(),true,rm->GetCastlingShort());
   SetColorCastle(movedPiece->GetColor(),false,rm->GetCastlingLong());
   Piece* cp = movedPiece->RetractMove(rm);
-  SetBoardPointer(movedPiece, targetfile, rm->GetTargetRank());
+  Move* m = new Move(startfile,rm->GetStartRank(),targetfile,rm->GetTargetRank());
+  DisplacePiece(m);
+  delete m;
+  m = 0x0;
   if (movedPiece->GetType() == king && abs(targetfile-startfile)==2) {
     short rookstartfile = startfile==3 ? 4 : 6;
     short rooktargetfile = startfile==3 ? 1: 8;
@@ -598,6 +574,8 @@ void Position::RetractMove(ReverseMove* rm) {
     if (r && r->GetType()==rook && r->GetColor() == movedPiece->GetColor()) {
       Move* rookmove = new Move(rookstartfile,rm->GetStartRank(),rooktargetfile,rm->GetStartRank());
       DisplacePiece(rookmove);
+      delete rookmove;
+      rookmove = 0x0;
     }
   }
   if (cp)
