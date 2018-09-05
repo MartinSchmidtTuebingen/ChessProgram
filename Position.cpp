@@ -25,8 +25,8 @@ Position::Position(PieceList *white, PieceList *black, short colortomove, bool w
   this->whitecancastlelong = whitecancastlelong;
   this->blackcancastleshort = blackcancastleshort;
   this->blackcancastlelong = blackcancastlelong;
-  CorrectCastling(whiteNumber);
-  CorrectCastling(blackNumber);
+//   CorrectCastling(whiteNumber);
+//   CorrectCastling(blackNumber);
   this->enpassantfile = enpassantfile;
   CorrectEnPassantFile();
 }
@@ -585,17 +585,36 @@ void Position::CapturePiece(Move *m, PieceList *pl) {
 }
 
 void Position::RetractMove(ReverseMove* rm) {
-  Piece* movedPiece = GetPieceOnField(rm->GetStartFile(), rm->GetStartRank());
+  if (!rm)
+    return;
+  
+  short startfile = rm->GetStartFile();
+  short targetfile = rm->GetTargetFile();
+  Piece* movedPiece = GetPieceOnField(startfile, rm->GetStartRank());
+  if (!movedPiece)
+    return;
+  
   SetEnPassantFile(rm->GetEnPassantFile());
   SetColorCastle(movedPiece->GetColor(),true,rm->GetCastlingShort());
   SetColorCastle(movedPiece->GetColor(),false,rm->GetCastlingLong());
   Piece* cp = movedPiece->RetractMove(rm);
-  SetBoardPointer(movedPiece, rm->GetTargetFile(), rm->GetTargetRank());
+  SetBoardPointer(movedPiece, targetfile, rm->GetTargetRank());
+  if (movedPiece->GetType() == king && abs(targetfile-startfile)==2) {
+    short rookstartfile = startfile==3 ? 4 : 6;
+    short rooktargetfile = startfile==3 ? 1: 8;
+    Piece* r = GetPieceOnField(rookstartfile,rm->GetStartRank());
+    if (r && r->GetType()==rook && r->GetColor() == movedPiece->GetColor()) {
+      Move* rookmove = new Move(rookstartfile,rm->GetStartRank(),rooktargetfile,rm->GetStartRank());
+      r->MovePiece(rookmove);
+      SetBoardPointer(r);
+    }
+  }
   CreatePiece(cp);
+  SetColorToMove(movedPiece->GetColor());
   return;
 }
 
-void Position::ExecuteMove(Move *m, ReverseMove* rm) {
+void Position::ExecuteMove(Move* m, ReverseMove* rm) {
   if (colortomove != whiteNumber && colortomove != blackNumber) {
     cout << "Define Color to Move" << endl;
     return;
@@ -607,6 +626,10 @@ void Position::ExecuteMove(Move *m, ReverseMove* rm) {
   const short startrank = m->GetStartRank();
   const short targetfile = m->GetTargetFile();
   const short targetrank = m->GetTargetRank();
+  Piece *p = GetPieceOnField(startfile, startrank);
+  if (p->GetColor() != GetColorToMove()) 
+    cout << "Warning: Wrong color to move" << endl;
+  
   Piece* cp = 0x0;
   if (!m->GetIDofCapturedPiece()) {
     cp = GetPieceOnField(targetfile, targetrank);
@@ -626,7 +649,6 @@ void Position::ExecuteMove(Move *m, ReverseMove* rm) {
     rm->SetCastlingLong(CanColorCastle(GetColorToMove(),false));
     rm->SetEnPassantFile(GetEnPassantFile());
   }
-  Piece *p = GetPieceOnField(startfile, startrank);
   const short movedpiecetype = p->GetType();
   PieceList *activelist = 0x0;
   PieceList *passivelist = 0x0;
@@ -658,25 +680,26 @@ void Position::ExecuteMove(Move *m, ReverseMove* rm) {
   passivelist->SetOwner(true);
   passivelist->DeletePiece(m);
   passivelist->SetOwner(false);
-  if ((movedpiecetype == king) && (startfile == 5) && (startrank == groundrank)) {
-    short rookstartfield, rooktargetfield;
-    rookstartfield = rooktargetfield = 0;
-    if (targetfile == 7) {
-      rookstartfield = 8;
-      rooktargetfield = 6;
+  if ((movedpiecetype == king) && (startfile == 5) && (startrank == groundrank) && (targetfile == 3 || targetfile == 7)) {
+    short rookstartfile = targetfile==3 ? 1 : 8;
+    short rooktargetfile = targetfile==3 ? 4 : 6;
+    if ((rookstartfile==1 && !CanColorCastle(colortomove,false)) || rookstartfile==8 && !CanColorCastle(colortomove,true))
+      cout << "Warning: Castling not allowed" << endl;
+    
+    SetColorCastle(colortomove,true,false);
+    SetColorCastle(colortomove,false,false);
+    
+    Piece *r = GetPieceOnField(rookstartfile,groundrank);
+    if (r) {
+      if (r->GetColor() != p->GetColor() || r->GetType() != rook) {
+        cout << "Warning: Rook to castle not present" << endl;
+      }
+      else {
+        Move *rookcastlemove = new Move(rookstartfile,groundrank,rooktargetfile,groundrank);
+        activelist->MovePiece(rookcastlemove);
+        SetBoardPointer(r);     
+      }
     }
-    if (targetfile == 3) {
-      rookstartfield = 1;
-      rooktargetfield = 4;
-    }
-    if (rookstartfield) {
-      Piece *r = GetPieceOnField(rookstartfield,groundrank);
-      Move *rookcastlemove = new Move(rookstartfield,groundrank,rooktargetfield,groundrank);
-      activelist->MovePiece(rookcastlemove);
-      SetBoardPointer(r);      
-      SetColorCastle(colortomove,true,false);
-      SetColorCastle(colortomove,false,false);
-    }	
   }
   if ((movedpiecetype == rook) && (startfile == 8) && (startrank == groundrank)) {
     SetColorCastle(colortomove,true,false);
