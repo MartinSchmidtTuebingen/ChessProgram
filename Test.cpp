@@ -4,9 +4,13 @@ using namespace std;
 #include "Test.h"
 #include "Evaluation.h"
 #include "Move.h"
+#include "EvalMoveList.h"
 #include "Piece.h"
 #include "PieceList.h"
 #include "Position.h"
+#include "Chess.h"
+#include "ReverseMoveStack.h"
+#include "ReverseMove.h"
 #include "SupportFunctions.h"
 
 Test::Test() {
@@ -283,7 +287,23 @@ void Test::TestPositionFunctions() {
   cout << "Test for Check: " << pos->IsChecked() << " Correct answer: 1" << endl;
   delete pos;
   pos = 0x0;
+  
+  cout << endl << "Test Position: Begin Test Reversed Move" << endl << endl;
+  pos = new Position(0x0,0x0,1,true,true,true,true,0);
+  pos->CreatePiece(king,whiteNumber,5,1);
+  pos->CreatePiece(rook,whiteNumber,1,1);
+  pos->CreatePiece(king,blackNumber,5,8);
+  pos->CreatePiece(rook,blackNumber,8,8);
+  pos->WriteOutPosition();
+  m = new Move(5,1,3,1);
+  ReverseMove* rm = new ReverseMove();
+  pos->ExecuteMove(m,rm);
+  pos->WriteOutPosition();
+  pos->RetractMove(rm);
+  pos->WriteOutPosition();
  
+  cout << endl << "Test Position: End Test Reversed Move" << endl << endl;
+  
   cout << endl << "Test Position: End Test Check" << endl << endl;
   
 }
