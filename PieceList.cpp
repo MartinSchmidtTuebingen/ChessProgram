@@ -118,16 +118,20 @@ void PieceList::SetUpStartPosition(short color) {
 }
 
 bool PieceList::IsPiece(short ID) const {
-  if (p) {
-    if (ID == p->GetID()) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-  else {
+  if (p) 
+    return ID==p->GetID();
+  else 
     return false;
+}
+
+Piece* PieceList::FindPiece(short ID) const {
+  if (IsPiece(ID))
+    return GetPiece();
+  else {
+    if (next)
+      return next->FindPiece(ID);
+    else
+      return 0x0;
   }
 }
     
@@ -195,7 +199,8 @@ void PieceList::MovePiece(Move *m) {
     p->MovePiece(m);
   }
   else {
-    if(next) next->MovePiece(m);
+    if(next) 
+      next->MovePiece(m);
   }
 }
 
@@ -222,7 +227,12 @@ void PieceList::DeletePiece(short ID) {
   }
   else {
     if (next) {
-      next->DeletePiece(ID);
+      if (!next->GetNext() && next->IsPiece(ID)) {
+        delete next;
+        next = 0x0;
+      }
+      else
+        next->DeletePiece(ID);
     }
     else {
       cout << "Error: Piece to delete not found" << endl;

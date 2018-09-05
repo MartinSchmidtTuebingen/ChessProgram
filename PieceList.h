@@ -30,6 +30,7 @@ public:
   //Other Functions
   bool IsPiece(short ID) const;
   short GetType(short ID) const;
+  Piece* FindPiece(short ID) const;
   short IsAnyPieceOnField(short searchedfile, short searchedrank) const;
   Piece* GetPieceOnField(short searchedfile, short searchedrank) const;
   Piece *GetKing() const;
