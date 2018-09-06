@@ -695,7 +695,7 @@ void Position::WriteOutPosition() {
   if (black)
     black->WriteOutPieces();
   else 
-    cout << "No white pieces." << endl;
+    cout << "No black pieces." << endl;
   
   if (check) 
     cout << (GetColorToMove()==whiteNumber ? "White" : "Black") << " is checked." << endl;
