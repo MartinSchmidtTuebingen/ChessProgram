@@ -370,9 +370,36 @@ bool Position::CheckDiagonalCheck(short opponenttype, short distance, short colo
   return false;
 }
 
+Piece* Position::GetNextPieceInDirection(int startfile,int startrank, int filedirection, int rankdirection) {
+  int file=startfile + filedirection;
+  int rank=startrank + rankdirection;
+  Piece* p = 0x0;
+  while (file <= MaxFile && file >= 1 && rank <= MaxRank && rank >= 1) {
+    p = GetPieceOnField(file,rank);
+    if (p)
+      return p;
+    file += filedirection;
+    rank += rankdirection;
+  }
+  return 0x0;
+}
+
 bool Position::LineCheck(short kingfile, short kingrank) const {
   short opponenttype;
-  const Piece *p = 0x0;
+  Piece *p = 0x0;
+  p = GetNextPieceInDirection(kingfile,kingrank,1,0);
+  int filedirection[4] = {1,-1,0,0};
+  int rankdirection[4] = {0,0,1,-1};
+  for (int i=0;i<4;++i) {
+    if (!p)
+      continue;
+    
+    int distance = abs(p->GetFile() - kingfile) * abs(filedirection[i]) + abs(p->GetRank() - kingrank) * abs(rankdirection[i]);
+    if (CheckLineCheck(p->GetType(),distance))
+      return true;
+    else
+      continue;
+  }
   for (int i=kingfile+1;i<=MaxFile;i++) {
     p = GetPieceOnField(i, kingrank);
  
