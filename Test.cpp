@@ -313,42 +313,62 @@ void Test::TestPositionFunctions() {
   pos = 0x0;
   
   cout << endl << "Testing all aspects of retracting a move" << endl;
-  pos = new Position(0x0,0x0,1,false,false,false,false);
+  pos = new Position(0x0,0x0,whiteNumber,false,false,false,false);
   pos->CreatePiece(pawn,whiteNumber,2,2);
   pos->CreatePiece(bishop,whiteNumber,4,5);
+  pos->CreatePiece(pawn,whiteNumber,8,7);
   
+  pos->CreatePiece(knight,blackNumber,8,6);
   pos->CreatePiece(pawn,blackNumber,3,4);
   pos->CreatePiece(rook,blackNumber,1,7);
-  pos->WriteOutPosition();
-  
+//   pos->WriteOutPosition();
+  for (int i=1;i<=8;++i) {
+    for (int j=1;j<=8;++j) {
+      if (pos->GetPieceOnField(i,j)) {
+        pos->GetPieceOnField(i,j)->WriteOutPiece();
+        cout << endl;
+      }
+    }
+  }
   ReverseMoveStack* rmstack = new ReverseMoveStack();
+
+  EvalMoveList* eml = new EvalMoveList();
+  eml->AddMove(new Move(8,7,8,8,0,rook));
+  eml->AddMove(new Move(8,6,6,7));
+  eml->AddMove(new Move(4,5,6,7));
+  eml->AddMove(new Move(1,7,6,7));
+  eml->AddMove(new Move(2,2,2,4));
+  eml->AddMove(new Move(3,4,2,3));
   
-  m = new Move(4,5,6,7);
-  rm = new ReverseMove();
-  pos->ExecuteMove(m,rm);
-  rmstack->AddReverseMove(rm);
-  delete m;
+  EvalMoveList* active = eml;
+  while (active) {
+    rm = new ReverseMove();
+    pos->ExecuteMove(active->GetMove(),rm);
+//     pos->WriteOutPosition();
+    rmstack->AddReverseMove(rm);
+    active = active->GetNext();
+  }
+  delete eml;
+  eml = 0x0;
   
-  m = new Move(1,7,6,7);
-  rm = new ReverseMove();
-  pos->ExecuteMove(m,rm);
-  rmstack->AddReverseMove(rm);
-  delete m;
-  m = 0x0;
-  
-  EvalMoveList* eml = new EvalMoveList(m,0x0,true);
-  
-  pos->WriteOutPosition();
+//   pos->WriteOutPosition();
   
   rm = rmstack->GetReverseMove();
   while (rm) {
     pos->RetractMove(rm);
     rm = rmstack->GetReverseMove();
+//     pos->WriteOutPosition();
   }
-  pos->RetractMove(rm);
-  pos->WriteOutPosition();
-  delete rm;
-  rm = 0x0;
+  for (int i=1;i<=8;++i) {
+    for (int j=1;j<=8;++j) {
+      if (pos->GetPieceOnField(i,j)) {
+        pos->GetPieceOnField(i,j)->WriteOutPiece();
+        cout << endl;
+      }
+    }
+  }
+//   pos->WriteOutPosition();
+
   delete rmstack;
   rmstack = 0x0;
   delete pos;
