@@ -63,9 +63,7 @@ void GameManager::RequestInput() {
   }
     
   string input;
-  
   cin >> input;
-  
   if (input == "Q" || input == "q") {
     SetStatus(leave);
   }

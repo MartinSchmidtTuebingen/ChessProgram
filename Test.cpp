@@ -290,6 +290,7 @@ void Test::TestPositionFunctions() {
   pos = 0x0;
   
   cout << endl << "Test Position: Begin Test Reversed Move" << endl << endl;
+  
   pos = new Position(0x0,0x0,1,true,true,true,true,0);
   pos->CreatePiece(king,whiteNumber,5,1);
   pos->CreatePiece(rook,whiteNumber,1,1);
@@ -300,16 +301,53 @@ void Test::TestPositionFunctions() {
   
   m = new Move(5,1,3,1);
   ReverseMove* rm = new ReverseMove();
+  cout << "Castling long and reversing the move" << endl;
   pos->ExecuteMove(m,rm);
-  cout << "Move finished" << endl;
-  pos->WriteOutPosition();
-  
   pos->RetractMove(rm);
-  cout << "ReMove finished" << endl;
   pos->WriteOutPosition();
-  
+  delete m;
+  m = 0x0;
+  delete rm;
+  rm = 0x0;
   delete pos;
   pos = 0x0;
+  
+  cout << endl << "Testing all aspects of retracting a move" << endl;
+  pos = new Position(0x0,0x0,1,false,false,false,false);
+  pos->CreatePiece(bishop,whiteNumber,3,4);
+  pos->CreatePiece(rook,blackNumber,1,7);
+  pos->WriteOutPosition();
+  
+  ReverseMoveStack* rmstack = new ReverseMoveStack();
+  
+  m = new Move(3,4,6,7);
+  rm = new ReverseMove();
+  pos->ExecuteMove(m,rm);
+  rmstack->AddReverseMove(rm);
+  delete m;
+  
+  m = new Move(1,7,6,7);
+  rm = new ReverseMove();
+  pos->ExecuteMove(m,rm);
+  rmstack->AddReverseMove(rm);
+  delete m;
+  m = 0x0;
+  
+  pos->WriteOutPosition();
+  
+  rm = rmstack->GetReverseMove();
+  while (rm) {
+    pos->RetractMove(rm);
+    rm = rmstack->GetReverseMove();
+  }
+  pos->RetractMove(rm);
+  pos->WriteOutPosition();
+  delete rm;
+  rm = 0x0;
+  delete rmstack;
+  rmstack = 0x0;
+  delete pos;
+  pos = 0x0;  
  
   cout << endl << "Test Position: End Test Reversed Move" << endl << endl;
   
