@@ -465,17 +465,21 @@ bool Position::IsMovePromotion(Move* m) {
 void Position::CreatePiece(Piece *p) {
   if (!p)
     return;
+  if (GetPieceOnField(p->GetFile(),p->GetRank())) {
+    cout << "Error: Could not create piece, field already set" << endl;
+    return;
+  }
   SetBoardPointer(p);
-  if (p->GetColor() == whiteNumber) {
+  if (p->GetColor()==whiteNumber) {
     if (white) 
       white->CreatePiece(p);
-    else 
+    else
       white = new PieceList(p);
   }
   else {
-    if (black) 
+    if (black)
       black->CreatePiece(p);
-    else 
+    else
       black = new PieceList(p);
   }
 }

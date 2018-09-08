@@ -314,13 +314,16 @@ void Test::TestPositionFunctions() {
   
   cout << endl << "Testing all aspects of retracting a move" << endl;
   pos = new Position(0x0,0x0,1,false,false,false,false);
-  pos->CreatePiece(bishop,whiteNumber,3,4);
+  pos->CreatePiece(pawn,whiteNumber,2,2);
+  pos->CreatePiece(bishop,whiteNumber,4,5);
+  
+  pos->CreatePiece(pawn,blackNumber,3,4);
   pos->CreatePiece(rook,blackNumber,1,7);
   pos->WriteOutPosition();
   
   ReverseMoveStack* rmstack = new ReverseMoveStack();
   
-  m = new Move(3,4,6,7);
+  m = new Move(4,5,6,7);
   rm = new ReverseMove();
   pos->ExecuteMove(m,rm);
   rmstack->AddReverseMove(rm);
@@ -332,6 +335,8 @@ void Test::TestPositionFunctions() {
   rmstack->AddReverseMove(rm);
   delete m;
   m = 0x0;
+  
+  EvalMoveList* eml = new EvalMoveList(m,0x0,true);
   
   pos->WriteOutPosition();
   

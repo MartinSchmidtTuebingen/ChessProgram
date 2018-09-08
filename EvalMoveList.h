@@ -3,14 +3,21 @@
 
 #include "EvalMove.h"
 
+class Move;
+
 class EvalMoveList {
 public:
   EvalMoveList(EvalMove* evalmove = 0x0, EvalMoveList* nextevalmove = 0x0, bool ownerflag = true);
+  EvalMoveList(Move* m, EvalMoveList* nextevalmove = 0x0, bool ownerflag = true);
   ~EvalMoveList();
   Move* GetMove() const {return em->GetMove();};
   void SetMove(Move* m) {em->SetMove(m);};
   float GetEvaluation() const {return em->GetEvaluation();};
   void SetEvaluation(float e) {em->SetEvaluation(e);};
+  void SetOwner(bool flag) {owner=flag;};
+  bool GetOwner() const {return owner;};
+  void AddEvalMove(EvalMove* evalmove);
+  void AddMove(Move* m);
   int GetMovesToFinish() const {return em->GetMovesToFinish();};
   void SetMovesToFinish(int moves) {em->SetMovesToFinish(moves);};
   bool GetStaleMate() const {em->GetStaleMate();};
