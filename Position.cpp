@@ -250,6 +250,21 @@ bool Position::IsLegal() const {
   return true;
 }
 
+Piece* Position::GetNextPieceInDirection(int startfile,int startrank, int filedirection, int rankdirection) const {
+  int file=startfile + filedirection;
+  int rank=startrank + rankdirection;
+  Piece* p = 0x0;
+  while (file <= MaxFile && file >= 1 && rank <= MaxRank && rank >= 1) {
+    p = GetPieceOnField(file,rank);
+    if (p) 
+      return p;
+      
+    file += filedirection;
+    rank += rankdirection;
+  }
+  return 0x0;
+}
+
 bool Position::IsChecked(short color) {
   short old = GetColorToMove();
   SetColorToMove(-color);
@@ -266,85 +281,62 @@ bool Position::IsChecked() const {
   
   if (!k)
     return false;
-  
-  const short kingfile = k->GetFile();
-  const short kingrank = k->GetRank();
-  k = 0x0;
-
-  //Check check from the diagonals
-  if (DiagonalCheck(kingfile,kingrank))
-    return true;   
 
   //Check check from lines
-  if (LineCheck(kingfile,kingrank)) 
-    return true;
-
-  //Check Knightcheck
-  if (KnightCheck(kingfile,kingrank)) 
+  if (LineCheck(k)) 
     return true;
   
+  //Check check from the diagonals
+  if (DiagonalCheck(k))
+    return true;   
+
+  //Check Knightcheck
+  if (KnightCheck(k))
+    return true;
+  
+  k = 0x0;
   return false;
 }
 
-bool Position::DiagonalCheck(short kingfile, short kingrank) const {
-  short opponenttype;
-  const Piece *p = 0x0;
-  //Check up right (as seen from white)
-  for (int i=1;i<=min(MaxFile-kingfile,MaxRank-kingrank);i++) {
-    p = GetPieceOnField(kingfile+i, kingrank+i);
-    
-    if(!p) 
+bool Position::LineCheck(Piece* k) const {
+  short kingfile = k->GetFile();
+  short kingrank = k->GetRank();
+  int filedirection[4] = {1,-1,0,0};
+  int rankdirection[4] = {0,0,1,-1};
+  for (int i=0;i<4;++i) {
+    Piece* p = GetNextPieceInDirection(kingfile,kingrank,filedirection[i],rankdirection[i]);
+    if (!p)
       continue;
     
-    if (p->GetColor() == colortomove && CheckDiagonalCheck(p->GetType(),i,blackNumber)) {
+    int distance = max(abs(p->GetFile() - kingfile),abs(p->GetRank() - kingrank));
+    if (k->GetColor() != p->GetColor() && CheckLineCheck(p->GetType(),distance))
       return true;
-    }
-    else {
-      break;
-    }
-  }
-  //Check down right (as seen from white)
-  for (int i=1;i<=min(MaxFile-kingfile,kingrank-1);i++) {
-    p = GetPieceOnField(kingfile+i, kingrank-i);
-    
-    if(!p) 
+    else
       continue;
-    
-    if (p->GetColor() == colortomove && CheckDiagonalCheck(p->GetType(),i,whiteNumber)) {
-      return true;
-    } 
-    else {
-      break;
-    }
   }
-  //Check down left (as seen from white)
-  for (int i=1;i<=min(kingfile-1,kingrank-1);i++) {
-    p = GetPieceOnField(kingfile-i, kingrank-i);
-    
-    if(!p) 
-      continue;
+  return false;
+}
 
-    if (p->GetColor() == colortomove && CheckDiagonalCheck(p->GetType(),i,whiteNumber)) {
-      return true;
-    }   
-    else {
-      break;
-    }
-  }
-  //Check up left (as seen from white)
-  for (int i=1;i<=min(kingfile-1,MaxRank-kingrank);i++) {
-    p = GetPieceOnField(kingfile-i, kingrank+i);
-    
-    if(!p) 
-      continue;
+bool Position::CheckLineCheck(short opponenttype, short distance) const {
+  return (opponenttype == king && distance == 1) || (opponenttype == rook || opponenttype == queen);
+}
 
-    if (p->GetColor() == colortomove && CheckDiagonalCheck(p->GetType(),i,blackNumber)) {
+bool Position::DiagonalCheck(Piece* k) const {
+  short kingfile = k->GetFile();
+  short kingrank = k->GetRank();
+  int filedirection[4] = {1,-1,-1,1};
+  int rankdirection[4] = {1,-1,1,-1};
+  for (int i=0;i<4;++i) {
+    Piece* p = GetNextPieceInDirection(kingfile,kingrank,filedirection[i],rankdirection[i]);
+    if (!p)
+      continue;
+    
+    int distance = max(abs(p->GetFile() - kingfile),abs(p->GetRank() - kingrank));
+    if (k->GetColor() != p->GetColor() && CheckDiagonalCheck(p->GetType(),distance,-rankdirection[i]))
       return true;
-    }
-    else {
-      break;
-    }
-  }  
+    else
+      continue;
+  }
   return false;
 }
 
@@ -370,96 +362,15 @@ bool Position::CheckDiagonalCheck(short opponenttype, short distance, short colo
   return false;
 }
 
-Piece* Position::GetNextPieceInDirection(int startfile,int startrank, int filedirection, int rankdirection) {
-  int file=startfile + filedirection;
-  int rank=startrank + rankdirection;
-  Piece* p = 0x0;
-  while (file <= MaxFile && file >= 1 && rank <= MaxRank && rank >= 1) {
-    p = GetPieceOnField(file,rank);
-    if (p)
-      return p;
-    file += filedirection;
-    rank += rankdirection;
-  }
-  return 0x0;
-}
 
-bool Position::LineCheck(short kingfile, short kingrank) const {
-  short opponenttype;
-  Piece *p = 0x0;
-  p = GetNextPieceInDirection(kingfile,kingrank,1,0);
-  int filedirection[4] = {1,-1,0,0};
-  int rankdirection[4] = {0,0,1,-1};
-  for (int i=0;i<4;++i) {
-    if (!p)
-      continue;
-    
-    int distance = abs(p->GetFile() - kingfile) * abs(filedirection[i]) + abs(p->GetRank() - kingrank) * abs(rankdirection[i]);
-    if (CheckLineCheck(p->GetType(),distance))
-      return true;
-    else
-      continue;
-  }
-  for (int i=kingfile+1;i<=MaxFile;i++) {
-    p = GetPieceOnField(i, kingrank);
- 
-    if(!p) 
-      continue;
-
-    if (p->GetColor() == colortomove && CheckLineCheck(p->GetType(),i-kingfile)) 
-      return true;
-    else 
-      break;
-  }
-  for (int i=kingfile-1;i>=1;i--) {
-    p = GetPieceOnField(i, kingrank);
-
-    if(!p) 
-      continue;
-     
-    if (p->GetColor() == colortomove && CheckLineCheck(p->GetType(),kingfile-i)) 
-      return true;
-    else 
-      break;
-  }
-  for (int i=kingrank+1;i<=MaxRank;i++) {
-    p = GetPieceOnField(kingfile, i);
-    
-    if(!p) 
-      continue;
-
-    if (p->GetColor() == colortomove && CheckLineCheck(p->GetType(),i-kingrank))
-      return true;
-    else 
-      break;
-  }
-  for (int i=kingrank-1;i>=1;i--) {
-    p = GetPieceOnField(kingfile, i);
-    
-    if(!p) 
-      continue;
-
-    if (p->GetColor() == colortomove && CheckLineCheck(p->GetType(),kingrank-i))
-      return true;
-    else 
-      break;
-  }
-  return false;
-}
-
-bool Position::CheckLineCheck(short opponenttype, short distance) const {
-  return (opponenttype == king && distance == 1) || (opponenttype == rook || opponenttype == queen);
-}
-
-
-bool Position::KnightCheck(short kingfile, short kingrank) const {
+bool Position::KnightCheck(Piece* k) const {
   for (int i=-2;i<=2;i++) {
     for (int j=-2;j<=2;j++) {
       if ((abs(i)+abs(j)) != 3)
         continue;
       
-      Piece* p = GetPieceOnField(kingfile+i,kingrank+j);
-      return (p && (p->GetColor() == colortomove || p->GetType() == knight));
+      Piece* p = GetPieceOnField(k->GetFile() + i,k->GetRank() + j);
+      return (p && (p->GetColor() != k->GetColor() || p->GetType() == knight));
     }
   }
   return false;

@@ -289,6 +289,7 @@ void Test::TestPositionFunctions() {
   delete pos;
   pos = 0x0;
   
+  cout << endl << "Finished Check test" << endl << endl;
   cout << endl << "Test Position: Begin Test Reversed Move" << endl << endl;
   
   pos = new Position(0x0,0x0,1,true,true,true,true,0);

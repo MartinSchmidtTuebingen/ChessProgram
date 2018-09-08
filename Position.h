@@ -38,12 +38,13 @@ public:
   bool IsMovePromotion(Move* m);
   bool IsLegal() const;
   void DeletePieceOnField(short searchedfile, short searchedrank);
+  Piece* GetNextPieceInDirection(int startfile,int startrank, int filedirection, int rankdirection) const;
   //The following support functions should be private after testing 
-  bool DiagonalCheck(short kingfile, short kingrank) const;
+  bool DiagonalCheck(Piece* p) const;
   bool CheckDiagonalCheck(short opponenttype, short distance, short colorpawncheck) const;
-  bool LineCheck(short kingfile, short kingrank) const;
+  bool LineCheck(Piece* p) const;
   bool CheckLineCheck(short opponenttype, short distance) const;
-  bool KnightCheck(short kingfile, short kingrank) const;
+  bool KnightCheck(Piece* p) const;
   void SetUpStartPosition();
   void CreatePiece(Piece *p);
   void CreatePiece(short type, short color, short filenumber, short ranknumber);
