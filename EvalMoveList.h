@@ -8,7 +8,6 @@ class Move;
 class EvalMoveList {
 public:
   EvalMoveList(EvalMove* evalmove = 0x0, EvalMoveList* nextevalmove = 0x0, bool ownerflag = true);
-  EvalMoveList(Move* m, EvalMoveList* nextevalmove = 0x0, bool ownerflag = true);
   ~EvalMoveList();
   Move* GetMove() const {return em->GetMove();};
   void SetMove(Move* m) {em->SetMove(m);};

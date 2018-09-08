@@ -4,14 +4,9 @@ EvalMoveList::EvalMoveList(EvalMove* evalmove, EvalMoveList* nextevalmove, bool 
   if (evalmove)
     em = evalmove;
   else
-    em = new EvalMove();
+    em = 0x0;
   next = nextevalmove;
   owner = ownerflag;
-}
-
-EvalMoveList::EvalMoveList(Move* m, EvalMoveList* nextevalmove, bool ownerflag) {
-  EvalMove* em = new EvalMove(m);
-  EvalMoveList(em,nextevalmove,ownerflag);
 }
 
 EvalMoveList::~EvalMoveList() {
