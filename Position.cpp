@@ -655,6 +655,8 @@ void Position::ExecuteMove(Move* m, ReverseMove* rm) {
   
   CapturePiece(m,rm);
   DisplacePiece(m);
+  if (rm && movedpiecetype != p->GetType())
+    rm->SetPromotion(true);
   
   if (movedpiecetype == king) {
     SetColorCastle(colortomove,true,false);
@@ -675,8 +677,9 @@ void Position::ExecuteMove(Move* m, ReverseMove* rm) {
 
 EvalMoveList* Position::MakeMoveList() const {
   PieceList* activelist = GetColorToMove()==whiteNumber ? white : black;
-  delete activelist;
-  activelist->MakeMoveList(this);
+  EvalMoveList* eml = activelist->MakeMoveList(this);
+  activelist = 0x0;
+  return eml;
 }
 
 void Position::WriteOutPosition() {

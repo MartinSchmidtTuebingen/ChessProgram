@@ -18,7 +18,7 @@ public:
   void SetIDofCapturedPiece(short id) {idcapturedpiece = id;};
   short GetTypeofCapturedPiece() const {return typecapturedpiece;};
   void SetTypeofCapturedPiece(short type) {typecapturedpiece = type;};
-  void SetPromotion(bool flag);
+  void SetPromotion(bool flag) {promotion = flag;};
   bool GetPromotion() const {return promotion;};
   void SetCastlingLong(bool castlong) {castlinglong = castlong;};
   bool GetCastlingLong() const {return castlinglong;};

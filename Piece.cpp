@@ -79,31 +79,37 @@ float Piece::GetValue(const Evaluation *eval) const {
 }
 
 void Piece::MovePiece(Move *m) {
-  file = m->GetTargetFile();
-  rank = m->GetTargetRank();
+  SetFile(m->GetTargetFile());
+  SetRank(m->GetTargetRank());
   short promotion = m->GetPromotion();
+  short opponentgroundrank = GetColor()==whiteNumber ? MaxRank : 1;
   if (promotion) {
-    if (!(type == pawn)) 
+    if (!(GetType() == pawn) && rank == opponentgroundrank) 
       cout << "Error: Only pawns can do a promotion." << endl;
     else 
-      type = promotion;
+      SetType(promotion);
+  }
+  else if (GetType() == pawn && rank == opponentgroundrank) {
+    cout << "Promote pawn automatically to queen" << endl;
+    SetType(queen);
   }
 }
 
 Piece* Piece::RetractMove(ReverseMove *rm) {
   SetFile(rm->GetTargetFile());
   SetRank(rm->GetTargetRank());
-  if (rm->GetPromotion())
-    type = pawn;
+  if (rm->GetPromotion()) 
+    SetType(pawn);
   
-  short type = rm->GetTypeofCapturedPiece();
+  short typecp = rm->GetTypeofCapturedPiece();
   
   Piece* cp = 0x0;
-  if (type >= king && type <= pawn) {
-    if (rm->GetEnPassantFile() == 0) 
-      cp = new Piece(type,-1 * GetColor(),rm->GetStartFile(), rm->GetStartRank());
-    else 
-      cp = new Piece(pawn,-1 * GetColor(),rm->GetStartFile(), rm->GetStartRank() - GetColor()==whiteNumber ? 1 : -1);
+  short opponentenpassantrank = GetColor()==whiteNumber ? 5 : 4;
+  if (typecp >= king && type <= pawn) {
+    if (rm->GetEnPassantFile() != rm->GetStartFile() || GetType() != pawn || rm->GetStartRank() != opponentenpassantrank+GetColor()) 
+      cp = new Piece(typecp,-1 * GetColor(),rm->GetStartFile(), rm->GetStartRank());
+    else
+      cp = new Piece(pawn,-1 * GetColor(),rm->GetStartFile(), opponentenpassantrank);
 
     cp->SetID(rm->GetIDofCapturedPiece());
   }  
