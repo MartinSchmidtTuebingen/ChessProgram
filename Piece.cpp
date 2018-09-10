@@ -150,11 +150,11 @@ Move* Piece::CreateMoveIfPieceCanMoveToField(short targetfile, short targetrank,
       }
     }
   }
-  if (pos->IsCheckedAfterMove(m)) {
+  if (m && pos->IsCheckedAfterMove(m)) {
     delete m;
     m = 0x0;
   }
-
+  
   return m;
 }
 
@@ -215,14 +215,9 @@ EvalMoveList* Piece::MakeMoveList(Position* pos) {
       bool free = true;
       int distance=1;
       while (free && rfile <= MaxFile && rfile >= 1 && rrank <= MaxRank && rrank >= 1 && distance < maxDistance) {
-        Piece* cp = pos->GetPieceOnField(rfile,rrank);
-        if (cp) {
-          free = false;
-          if (cp->GetColor() != GetColor()) 
-            eml->AddMove(new Move(startfile,startrank,rfile,rrank,cp->GetID(),0));
-        }
-        else 
-          eml->AddMove(new Move(startfile,startrank,rfile,rrank,0,0));
+        Move* m = CreateMoveIfPieceCanMoveToField(rfile,rrank,pos);
+        if (m)
+          eml->AddMove(m);
         
         rfile += filedirections[i];
         rrank += rankdirections[i];
@@ -262,7 +257,3 @@ void Piece::WriteOutPiece() {
       break;
   }
 }
-/*
-MoveTree Piece::MakeMoveTree(Position p) {
-  
-}*/
