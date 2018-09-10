@@ -377,6 +377,72 @@ void Test::TestPositionFunctions() {
  
   cout << endl << "Test Position: End Test Reversed Move" << endl << endl;
   
-  cout << endl << "Test Position: End Test Check" << endl << endl;
+  cout << endl << "Test Piece: Start Test MakeMoveTree" << endl << endl;
+  pos = new Position();
   
+  pos->CreatePiece(king,whiteNumber,3,3);
+  m = pos->GetPieceOnField(3,3)->CreateMoveIfPieceCanMoveToField(3,4,pos);
+  cout << m;
+  if (m)
+    cout << " " << m->GetStartFile() << " " << m->GetStartRank() << " " << m->GetTargetFile() << " " << m->GetTargetRank() << " " << m->GetIDofCapturedPiece();
+  cout << endl;
+  delete m;  
+  
+  pos->CreatePiece(knight,blackNumber,3,4);
+  m = pos->GetPieceOnField(3,3)->CreateMoveIfPieceCanMoveToField(3,4,pos);
+  cout << m;
+  if (m)
+    cout << " " << m->GetStartFile() << " " << m->GetStartRank() << " " << m->GetTargetFile() << " " << m->GetTargetRank() << " " << m->GetIDofCapturedPiece();
+  cout << endl;
+  delete m;
+  
+  pos->CreatePiece(pawn,whiteNumber,3,2);
+  m = pos->GetPieceOnField(3,3)->CreateMoveIfPieceCanMoveToField(3,2,pos);
+  cout << m;
+  if (m)
+    cout << " " << m->GetStartFile() << " " << m->GetStartRank() << " " << m->GetTargetFile() << " " << m->GetTargetRank() << " " << m->GetIDofCapturedPiece();
+  cout << endl;
+  delete m;
+  
+  pos->CreatePiece(pawn,blackNumber,6,2);
+  m = pos->GetPieceOnField(6,2)->CreateMoveIfPieceCanMoveToField(6,1,pos);
+  cout << m;
+  if (m)
+    cout << " " << m->GetStartFile() << " " << m->GetStartRank() << " " << m->GetTargetFile() << " " << m->GetTargetRank() << " " << m->GetIDofCapturedPiece();
+  cout << endl;
+  delete m;
+  
+  m = pos->GetPieceOnField(6,2)->CreateMoveIfPieceCanMoveToField(7,1,pos);
+  cout << m;
+  if (m)
+    cout << " " << m->GetStartFile() << " " << m->GetStartRank() << " " << m->GetTargetFile() << " " << m->GetTargetRank() << " " << m->GetIDofCapturedPiece();
+  cout << endl;
+  delete m;  
+  
+  pos->CreatePiece(bishop,whiteNumber,5,1);
+  m = pos->GetPieceOnField(6,2)->CreateMoveIfPieceCanMoveToField(5,1,pos);
+  cout << m;
+  if (m)
+    cout << " " << m->GetStartFile() << " " << m->GetStartRank() << " " << m->GetTargetFile() << " " << m->GetTargetRank() << " " << m->GetIDofCapturedPiece();
+  cout << endl;
+  delete m;  
+  
+  pos->CreatePiece(knight,blackNumber,8,6);
+  pos->CreatePiece(pawn,blackNumber,7,5);
+  pos->CreatePiece(pawn,whiteNumber,8,5);
+  pos->SetEnPassantFile(7);
+  m = pos->GetPieceOnField(8,5)->CreateMoveIfPieceCanMoveToField(7,6,pos);
+  cout << m;
+  if (m)
+    cout << " " << m->GetStartFile() << " " << m->GetStartRank() << " " << m->GetTargetFile() << " " << m->GetTargetRank() << " " << m->GetIDofCapturedPiece();
+  cout << endl;
+  delete m; 
+  
+  delete pos;
+  pos = 0x0;
+  m = 0x0;
+  delete m;
+  m = 0x0;
+  cout << endl << endl << "Test Piece: End Test MakeMoveTree" << endl << endl;
+  return;
 }

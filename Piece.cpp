@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 #include <string>
 using namespace std;
@@ -116,129 +117,113 @@ Piece* Piece::RetractMove(ReverseMove *rm) {
   return cp;
 }
 
-EvalMoveList* Piece::MakeMoveList(Position* const p) const {
-  EvalMoveList* ml = new EvalMoveList();
-  if (type == king) {
-    for (int i=-1;i<=1;i++) {
-      for (int j=-1;j<=1;j++) {
-	if (!(i == 0 && j == 0)) {
-	  Move* m = new Move(file,rank,file+i,file+j);
-	  if (p->IsMoveLegal(m))
-	    ml->SetMove(m);
-	  else
-	    delete m;
-	  
-	  m = 0x0;
-	}
+Move* Piece::CreateMoveIfPieceCanMoveToField(short targetfile, short targetrank, Position* pos) {
+  Move* m = 0x0;
+  if (GetType() != pawn) {
+    Piece* cp = pos->GetPieceOnField(targetfile,targetrank);
+    if (cp) {
+      if (GetColor() != cp->GetColor()) 
+        m = new Move(GetFile(),GetRank(),targetfile,targetrank,cp->GetID());
+    }
+    else
+      m = new Move(GetFile(),GetRank(),targetfile,targetrank);
+  }
+  else if (GetType() == pawn) {
+    short opponentgroundrank = GetColor()==whiteNumber ? MaxRank : 1;
+    short enpassantrank = GetColor()==whiteNumber ? 6 :3;
+    Piece* cp = pos->GetPieceOnField(targetfile,targetrank);
+    if (GetFile() == targetfile) {
+      if (!cp)
+        m = new Move(GetFile(),GetRank(),targetfile,targetrank);
+    }
+    else {
+      if (cp) {
+        if (cp->GetColor() != GetColor())
+          m = new Move(GetFile(),GetRank(),targetfile,targetrank,cp->GetID());
+      }
+      else if (targetfile==pos->GetEnPassantFile() && targetrank==enpassantrank){
+        cp = pos->GetPieceOnField(targetfile,enpassantrank - GetColor());
+        if (cp)
+          m = new Move(GetFile(),GetRank(),targetfile,targetrank,cp->GetID());
+        else
+          cout << "Position illegal: En passant set, but no pawn on the field " << GetField(targetfile,enpassantrank - GetColor()) << endl;
       }
     }
   }
-  else if (type == queen) {
-    for (int i=1;i<=MaxFile-file;i++) {
-      Move* m = new Move(file,rank,file+i,file);
-      if (p->IsMoveLegal(m))
-        ml->SetMove(m);
-      else
-        delete m;
-      
-      m = 0x0;
-      if(p->GetPieceOnField(file+i,rank))
-	break;
+
+  return m;
+}
+
+EvalMoveList* Piece::MakeMoveList(Position* pos) {
+  EvalMoveList* eml = new EvalMoveList();
+  int filedirections[8] = {1,-1,-1,1,1,-1,0,0};
+  int rankdirections[8] = {1,-1,1,-1,0,0,1,-1};
+  int start=0;
+  int end=8;
+  int startfile=GetFile();
+  int startrank=GetRank();
+
+  int groundrank = GetColor()==whiteNumber ? 1 : MaxRank;
+  switch(GetType()) {
+    case king: 
+      if (pos->CanColorCastle(GetColor(),true) && pos->IsCastlingPossibleFromPosition(GetColor(), true))
+        eml->AddMove(new Move(5,groundrank,7,groundrank));
+      if (pos->CanColorCastle(GetColor(),false) && pos->IsCastlingPossibleFromPosition(GetColor(), false))
+        eml->AddMove(new Move(5,groundrank,3,groundrank));
+      break;
+    case queen: 
+      break;
+    case rook: 
+      start=4;
+      break;
+    case bishop: 
+      end=4;
+      break;
+  }
+  if (GetType()==knight) {
+    for (int i=-2;i<=2;i++) {
+      for (int j=-2;j<=2;j++) {
+        short newfile=startfile+i;
+        short newrank=startrank+j;
+        if ((abs(i)+abs(j)) != 3 || newfile > MaxFile || newfile < 1 || newrank > MaxRank || newrank < 1)
+          continue;
+        
+        Piece* cp = pos->GetPieceOnField(newfile,newrank);
+        if (cp) {
+          if (cp->GetColor() != GetColor())
+            eml->AddMove(new Move(startfile,startrank,newfile,newrank,cp->GetID()));
+        }
+        else
+          eml->AddMove(new Move(startfile,startrank,newfile,newrank,0));
+      }
     }
-    for (int i=1;i<=file-1;i++) {
-      Move* m = new Move(file,rank,file-i,file);
-      if (p->IsMoveLegal(m))
-        ml->SetMove(m);
-      else
-        delete m;
-      
-      m = 0x0;
-      if(p->GetPieceOnField(file-i,rank))
-	break;
-    }
-    //TODO: From here
-    for (int i=1;i<=MaxFile-file;i++) {
-      Move* m = new Move(file,rank,file+i,file);
-      if (p->IsMoveLegal(m))
-        ml->SetMove(m);
-      else
-        delete m;
-      
-      m = 0x0;
-      if(p->GetPieceOnField(file+i,rank))
-	break;
-    }
-    for (int i=1;i<=MaxFile-file;i++) {
-      Move* m = new Move(file,rank,file+i,file);
-      if (p->IsMoveLegal(m))
-        ml->SetMove(m);
-      else
-        delete m;
-      
-      m = 0x0;
-      if(p->GetPieceOnField(file+i,rank))
-        break;
-    }
-    for (int i=1;i<=MaxFile-file;i++) {
-      Move* m = new Move(file,rank,file+i,file);
-      if (p->IsMoveLegal(m))
-        ml->SetMove(m);
-      else
-        delete m;
-      
-      m = 0x0;
-      if(p->GetPieceOnField(file+i,rank))
-	break;
-    }
-    for (int i=1;i<=MaxFile-file;i++) {
-      Move* m = new Move(file,rank,file+i,file);
-      if (p->IsMoveLegal(m))
-        ml->SetMove(m);
-      else
-        delete m;
-      
-      m = 0x0;
-      if(p->GetPieceOnField(file+i,rank))
-	break;
-    }
-    for (int i=1;i<=MaxFile-file;i++) {
-      Move* m = new Move(file,rank,file+i,file);
-      if (p->IsMoveLegal(m))
-        ml->SetMove(m);
-      else
-        delete m;
-      
-      m = 0x0;
-      if(p->GetPieceOnField(file+i,rank))
-	break;
-    }
-    for (int i=1;i<=MaxFile-file;i++) {
-      Move* m = new Move(file,rank,file+i,file);
-      if (p->IsMoveLegal(m))
-        ml->SetMove(m);
-      else
-        delete m;
-      
-      m = 0x0;
-      if(p->GetPieceOnField(file+i,rank))
-	break;
-    }
+  }
+  else if (GetType()==pawn) {
     
   }
-  else if (type == rook) {
-    
+  else if (GetType()!=noPiece) {
+    for (int i=start;i<end;i++) {
+      int rfile = startfile + filedirections[i];
+      int rrank = startrank + rankdirections[i];
+      bool free = true;
+      int distance=1;
+      while (free && rfile <= MaxFile && rfile >= 1 && rrank <= MaxRank && rrank >= 1 && (GetType()!=king || distance <=1)) {
+        Piece* cp = pos->GetPieceOnField(rfile,rrank);
+        if (cp) {
+          free = false;
+          if (cp->GetColor() != GetColor()) 
+            eml->AddMove(new Move(startfile,startrank,rfile,rrank,cp->GetID(),0));
+        }
+        else 
+          eml->AddMove(new Move(startfile,startrank,rfile,rrank,0,0));
+        
+        rfile += filedirections[i];
+        rrank += rankdirections[i];
+        distance++;
+      }
+    }
   }
-  else if (type == bishop) {
-    
-  }
-  else if (type == knight) {
-    
-  }
-  else if (type == pawn) {
-    
-  }
-  return ml;
-  return 0x0;
+  return eml;
 }
 
 void Piece::WriteOutPiece() {

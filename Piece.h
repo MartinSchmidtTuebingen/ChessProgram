@@ -39,9 +39,9 @@ public:
   //Move the piece according to the Move m
   void MovePiece(Move *m);
   Piece* RetractMove(ReverseMove *rm);
+  Move* CreateMoveIfPieceCanMoveToField(short targetfile, short targetrank, Position* pos);
   //Returns a pointer to a list of moves which can be done by this piece
-  //MoveTree MakeMoveTree(Position p);
-  EvalMoveList* MakeMoveList(Position* const p) const;
+  EvalMoveList* MakeMoveList(Position* pos);
   void WriteOutPiece();
  
 private:
