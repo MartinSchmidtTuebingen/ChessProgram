@@ -376,20 +376,28 @@ bool Position::KnightCheck(Piece* k) const {
   return false;
 }
 
+bool Position::IsCheckedAfterMove(Move* m) {
+  ReverseMove* rm = new ReverseMove();
+  ExecuteMove(m, rm);
+  bool checked=IsChecked();
+  RetractMove(rm);
+  delete rm;
+  rm = 0x0;  
+  return checked;
+}
+
 bool Position::IsMoveLegal(Move* m){
-  cout << "Attention: Legality only checks at the moment if there is a piece on the start field that has the right color, whether is a piece of the same color on the end field and if the own king is checked after the move" << endl;
+//   cout << "Attention: Legality only checks at the moment if there is a piece on the start field that has the right color, whether is a piece of the same color on the end field and if the own king is checked after the move" << endl;
   Piece* p = GetPieceOnField(m->GetStartFile(), m->GetStartRank());
   Piece* cp = GetPieceOnField(m->GetTargetFile(), m->GetTargetRank());
   if (!p || p->GetColor() != GetColorToMove())
     return false;
-  else if (cp && p->GetColor() == cp->GetColor())
+  else if (cp && (p->GetColor() == cp->GetColor()))
     return false;
   else {
-    ReverseMove* rm = new ReverseMove();
-    ExecuteMove(m, rm);
-    if (IsChecked())
+    bool checked=IsCheckedAfterMove(m);
+    if (checked)
       return false;
-    RetractMove(rm);
   }
   return true;
 }

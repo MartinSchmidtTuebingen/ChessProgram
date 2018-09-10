@@ -35,6 +35,7 @@ public:
   //Checks if the specified color is in a check.
   bool IsChecked(short color);
   bool IsMoveLegal(Move* m);
+  bool IsCheckedAfterMove(Move* m);
   bool IsMovePromotion(Move* m);
   bool IsLegal() const;
   void DeletePieceOnField(short searchedfile, short searchedrank);
