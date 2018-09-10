@@ -459,15 +459,22 @@ void Position::CapturePiece(Move *m, ReverseMove* rm) {
   short targetfile=m->GetTargetFile();
   short targetrank=m->GetTargetRank();
   
-  PieceList *passivelist = GetColorToMove()==whiteNumber ? black : white;
-  short enpassantrank = GetColorToMove()==whiteNumber ? 5 : 4;
-  short targetrankforenpassant = enpassantrank + GetColorToMove();
+  Piece* p = GetPieceOnField(m->GetStartFile(),m->GetStartRank());
+  if (!p) {
+    cout << "Error: Position::CapturePiece: No piece to move found" << endl;
+    return;
+  }
+  
+  short color = p->GetColor();
+  PieceList *passivelist = color==whiteNumber ? black : white;
+  short enpassantrank = color==whiteNumber ? 5 : 4;
+  short targetrankforenpassant = enpassantrank + color;
   
   Piece* cp = 0x0;
   if (m->GetIDofCapturedPiece()) {
     cp = passivelist->FindPiece(m->GetIDofCapturedPiece());
     if (!cp)
-      cout << "Warning: Given ID for captured piece, no piece found with this ID" << endl;
+      cout << "Warning: Given ID " << m->GetIDofCapturedPiece() << " for captured piece, no piece found with this ID" << endl;
   }
   
   if (!cp)
@@ -560,8 +567,8 @@ void Position::ExecuteMove(Move* m, ReverseMove* rm) {
     return;
   }
   
-  if (p->GetColor() != GetColorToMove()) 
-    cout << "Warning: Wrong color to move" << endl;
+//   if (p->GetColor() != GetColorToMove()) 
+//     cout << "Warning: Wrong color to move" << endl;
 
   if (rm) {
     rm->SetFields(targetfile, targetrank, startfile, startrank);
