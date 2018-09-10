@@ -150,6 +150,10 @@ Move* Piece::CreateMoveIfPieceCanMoveToField(short targetfile, short targetrank,
       }
     }
   }
+  if (pos->IsCheckedAfterMove(m)) {
+    delete m;
+    m = 0x0;
+  }
 
   return m;
 }
@@ -162,7 +166,7 @@ EvalMoveList* Piece::MakeMoveList(Position* pos) {
   int end=8;
   int startfile=GetFile();
   int startrank=GetRank();
-
+  short maxDistance = max(MaxFile,MaxRank);
   int groundrank = GetColor()==whiteNumber ? 1 : MaxRank;
   switch(GetType()) {
     case king: 
@@ -170,6 +174,7 @@ EvalMoveList* Piece::MakeMoveList(Position* pos) {
         eml->AddMove(new Move(5,groundrank,7,groundrank));
       if (pos->CanColorCastle(GetColor(),false) && pos->IsCastlingPossibleFromPosition(GetColor(), false))
         eml->AddMove(new Move(5,groundrank,3,groundrank));
+      maxDistance = 1;
       break;
     case queen: 
       break;
@@ -178,6 +183,15 @@ EvalMoveList* Piece::MakeMoveList(Position* pos) {
       break;
     case bishop: 
       end=4;
+      break;
+    case knight:
+      break;
+    case pawn:
+      maxDistance = 1;
+      end=3;
+      filedirections[2]=0;
+      for (int i=0;i<3;i++)
+        rankdirections[i]=GetColor();
       break;
   }
   if (GetType()==knight) {
@@ -188,18 +202,11 @@ EvalMoveList* Piece::MakeMoveList(Position* pos) {
         if ((abs(i)+abs(j)) != 3 || newfile > MaxFile || newfile < 1 || newrank > MaxRank || newrank < 1)
           continue;
         
-        Piece* cp = pos->GetPieceOnField(newfile,newrank);
-        if (cp) {
-          if (cp->GetColor() != GetColor())
-            eml->AddMove(new Move(startfile,startrank,newfile,newrank,cp->GetID()));
-        }
-        else
-          eml->AddMove(new Move(startfile,startrank,newfile,newrank,0));
+        Move* m = CreateMoveIfPieceCanMoveToField(newfile,newrank,pos);
+        if (m)
+          eml->AddMove(m);
       }
     }
-  }
-  else if (GetType()==pawn) {
-    
   }
   else if (GetType()!=noPiece) {
     for (int i=start;i<end;i++) {
@@ -207,7 +214,7 @@ EvalMoveList* Piece::MakeMoveList(Position* pos) {
       int rrank = startrank + rankdirections[i];
       bool free = true;
       int distance=1;
-      while (free && rfile <= MaxFile && rfile >= 1 && rrank <= MaxRank && rrank >= 1 && (GetType()!=king || distance <=1)) {
+      while (free && rfile <= MaxFile && rfile >= 1 && rrank <= MaxRank && rrank >= 1 && distance < maxDistance) {
         Piece* cp = pos->GetPieceOnField(rfile,rrank);
         if (cp) {
           free = false;
