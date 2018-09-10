@@ -44,7 +44,6 @@ string GetRank(short rank) {
 }
 
 string GetFile(short file) {
-  string output;
   switch (file) {
     case 1:
       return "a";
@@ -67,8 +66,22 @@ string GetFile(short file) {
   }
 }
   
-  
-  
+string GetPieceShortName(short type) {
+  switch(type) {
+    case king:
+      return "K";
+    case queen:
+      return "Q";
+    case rook:
+      return "R";
+    case bishop:
+      return "B";
+    case knight:
+      return "N";
+    default:
+      return "";
+  }
+}
 
 short GetTypeFromString(string input) {
   if (input.length() == 2) {

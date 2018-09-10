@@ -6,7 +6,7 @@ Chess.out:  $(OBJS)
 SupportFunctions.o : SupportFunctions.cpp SupportFunctions.h
 	g++ -c SupportFunctions.cpp -std=gnu++11	
 	
-Move.o : Move.cpp Move.h Piece.h
+Move.o : Move.cpp Move.h Piece.h SupportFunctions.h
 
 ReverseMove.o : ReverseMove.cpp ReverseMove.h Piece.h
 

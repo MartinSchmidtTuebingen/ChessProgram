@@ -10,6 +10,7 @@ std::string GetColor(short color);
 std::string GetField(short file, short rank);
 std::string GetFile(short file);
 std::string GetRank(short file);
+std::string GetPieceShortName(short type);
 short GetTypeFromString(std::string input);
 short GetTypeFromSingleString(std::string input);
 short GetFileFromString(std::string input);

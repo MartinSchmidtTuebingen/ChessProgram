@@ -552,7 +552,6 @@ void Position::ExecuteMove(Move* m, ReverseMove* rm) {
   const short startrank = m->GetStartRank();
   const short targetfile = m->GetTargetFile();
   const short targetrank = m->GetTargetRank();
-  cout << GetField(startfile,startrank) << "-" << GetField(targetfile,targetrank) << endl; 
   Piece *p = GetPieceOnField(startfile, startrank);
   if (!p) {
     cout << "Error: No Piece to move" << endl;
@@ -601,6 +600,7 @@ void Position::ExecuteMove(Move* m, ReverseMove* rm) {
   
   CapturePiece(m,rm);
   DisplacePiece(m);
+//   m->WriteOutMove();cout << endl;
   if (rm && movedpiecetype != p->GetType())
     rm->SetPromotion(true);
   

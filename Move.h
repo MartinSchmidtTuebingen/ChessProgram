@@ -1,6 +1,8 @@
 #ifndef MOVE_H
 #define MOVE_H
 
+#include "SupportFunctions.h"
+
 class Test;
 
 class Move {
@@ -16,6 +18,7 @@ public:
   void SetIDofCapturedPiece(short ID) {idcapturedpiece = ID;};
   void SetPromotion(short flag);
   short GetPromotion() const {return promotion;};
+  void WriteOutMove() const;
 private:
   friend class Test;
   short startfile;
