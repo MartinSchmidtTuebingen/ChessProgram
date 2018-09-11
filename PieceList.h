@@ -38,7 +38,7 @@ public:
   void DeletePiece(Move *m); 
   void DeletePiece(short ID);  
   float GetValuePieces(const Evaluation *eval = 0x0) const;
-  EvalMoveList* MakeMoveList(const Position* const p) const;
+  EvalMoveList* MakeMoveList(Position* pos) const;
   void WriteOutPieces() const;
 private:
   friend class Test;

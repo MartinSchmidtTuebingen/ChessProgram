@@ -463,11 +463,45 @@ void Test::TestPositionFunctions() {
   delete eml;
   eml = 0x0;
   
-//   pos->SetUpStartPosition();
-//   pos->WriteOutPosition();
+//   delete pos;
+//   pos = new Position();
+//   pos->CreatePiece(knight,whiteNumber,2,1);
 //   eml = pos->MakeMoveList();
 //   eml->WriteOutMoves();
+//   delete eml;
+
+  pos->SetUpStartPosition();
+  pos->WriteOutPosition();
+  eml = pos->MakeMoveList();
+  eml->WriteOutMoves();
   
+  m = new Move(5,2,5,4);
+  pos->ExecuteMove(m);
+  delete eml;
+  eml = pos->MakeMoveList();
+  cout << endl;
+  eml->WriteOutMoves();
+  delete m;
+  m = new Move(4,7,4,5);
+  pos->ExecuteMove(m);
+  delete eml;
+  eml = pos->MakeMoveList();
+  cout << endl;
+  eml->WriteOutMoves();
+  delete eml;
+  delete m;
+  m = new Move(6,1,2,5);
+  pos->ExecuteMove(m);
+  eml = pos->MakeMoveList(),
+  cout << endl;
+  eml->WriteOutMoves();
+  delete m;
+  m = new Move(8,7,8,6);
+  cout << pos->IsMoveLegal(m) << endl;
+  
+  
+  delete eml;
+  eml=0x0;
   delete pos;
   pos = 0x0;
   delete m;

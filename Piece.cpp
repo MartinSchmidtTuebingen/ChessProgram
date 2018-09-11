@@ -128,7 +128,7 @@ Move* Piece::CreateMoveIfPieceCanMoveToField(short targetfile, short targetrank,
     else
       m = new Move(GetFile(),GetRank(),targetfile,targetrank);
   }
-  else if (GetType() == pawn) {
+  else {
     short opponentgroundrank = GetColor()==whiteNumber ? MaxRank : 1;
     short enpassantrank = GetColor()==whiteNumber ? 6 :3;
     Piece* cp = pos->GetPieceOnField(targetfile,targetrank);
@@ -216,6 +216,8 @@ EvalMoveList* Piece::MakeMoveList(Position* pos) {
       int rrank = startrank + rankdirections[i];
       bool free = true;
       int distance=1;
+      if (GetType()==pawn && filedirections[i]==0 && GetRank() == groundrank+GetColor())
+        maxDistance = 2;
       while (free && rfile <= MaxFile && rfile >= 1 && rrank <= MaxRank && rrank >= 1 && distance <= maxDistance) {
         Move* m = CreateMoveIfPieceCanMoveToField(rfile,rrank,pos);
         if (m) {

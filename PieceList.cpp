@@ -49,7 +49,13 @@ PieceList::PieceList(const PieceList& copy) {
 }
 
 PieceList::~PieceList() {
-  ClearList();
+  if (p && GetOwner())
+    delete p;
+  p = 0x0;
+  if (next)
+    delete next;
+  
+  next = 0x0;
 }
 
 void PieceList::ClearList() {
@@ -58,16 +64,21 @@ void PieceList::ClearList() {
     delete next;
     next = 0x0;
   }
-  if (GetOwner() == true) {
+  if (GetOwner()) {
     delete p;
   }
   p = 0x0;
 }
 
 void PieceList::CreatePiece(Piece *np) {
+  if (!np)
+    return;
+  
   if (p) {
-    PieceList *pl = new PieceList(np, next);
-    next = pl;
+    if (!next)
+     next = new PieceList();
+    
+    next->CreatePiece(np);
   }
   else {
     p = np;
@@ -75,14 +86,8 @@ void PieceList::CreatePiece(Piece *np) {
 }
 
 void PieceList::CreatePiece(short type, short color, short filenumber, short ranknumber) { 
-  if (p) {
-    PieceList *pl = new PieceList(type, color, filenumber, ranknumber, next);
-    next = pl;
-  }
-  else {
-    Piece *np = new Piece(type,color,filenumber,ranknumber);
-    p = np;    
-  }
+  Piece* np = new Piece(type,color,filenumber,ranknumber);
+  CreatePiece(np);
 }
 
 void PieceList::SetUpStartPosition(short color) {
@@ -94,27 +99,15 @@ void PieceList::SetUpStartPosition(short color) {
     ClearList();
   }
   
-  short groundrank,pawnrank;
-  groundrank = pawnrank = 0;
-  if (color == whiteNumber) {
-    groundrank = 1;
-    pawnrank = 2;
-  }
-  if (color == blackNumber) {
-    groundrank = 8;
-    pawnrank = 7;
-  }
-  CreatePiece(3,color,1,groundrank);
-  CreatePiece(5,color,2,groundrank);
-  CreatePiece(3,color,3,groundrank);
-  CreatePiece(2,color,4,groundrank);
-  CreatePiece(1,color,5,groundrank);
-  CreatePiece(4,color,6,groundrank);
-  CreatePiece(5,color,7,groundrank);
-  CreatePiece(3,color,8,groundrank);
-  for (int i=1;i<=8;i++) {
-    CreatePiece(6,color,i,pawnrank);
-  }
+  short groundrank = color==whiteNumber ? 1 : MaxRank;
+  short pawnrank = groundrank + color;
+  int piecetypes[8] = {rook,knight,bishop,queen,king,bishop,knight,rook};
+  for (int i=1;i<=8;i++) 
+    CreatePiece(piecetypes[i-1],color,i,groundrank);  
+  for (int i=1;i<=8;i++) 
+    CreatePiece(pawn,color,i,pawnrank);
+  
+  return;
 }
 
 bool PieceList::IsPiece(short ID) const {
@@ -246,13 +239,13 @@ float PieceList::GetValuePieces(const Evaluation *eval) const {
   return result;
 }
 
-EvalMoveList* PieceList::MakeMoveList(const Position *p) const {
-  EvalMoveList *ml = p->MakeMoveList();
+EvalMoveList* PieceList::MakeMoveList(Position *pos) const {
+  EvalMoveList *eml = GetPiece()->MakeMoveList(pos);
   if (next) { 
-    EvalMoveList* mlnext = next->MakeMoveList(p);
-    ml->Append(ml);
+    EvalMoveList* emlnext = next->MakeMoveList(pos);
+    eml->Append(emlnext);
   }
-  return ml;
+  return eml;
 }
   
 
