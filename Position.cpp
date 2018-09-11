@@ -59,29 +59,25 @@ void Position::SetColorToMove(short color) {
 }
 
 void Position::SetUpStartPosition() {
-  colortomove = whiteNumber;
+  SetColorToMove(whiteNumber);
   for (short i=0;i<4;i++)
     castlingallowed[i]=true;
   
   enpassantfile = 0;
+  
   delete board;
   board = new Piece*[MaxFile * MaxRank]; 
-  if (white) {
-    white->ClearList();
-  }
-  else {
-    white = new PieceList();
-  }
+  
+  delete white;
+  white = new PieceList();
   white->SetUpStartPosition(whiteNumber);
   SetBoardPointer(white);
-  if (black) {
-    black->ClearList();
-  }
-  else {
-    black = new PieceList();
-  }
+
+  delete black;
+  black = new PieceList();
   black->SetUpStartPosition(blackNumber);
   SetBoardPointer(black);
+  return;
 }
 
 void Position::SetBoardPointer(PieceList *pl) {
@@ -554,11 +550,11 @@ void Position::ExecuteMove(Move* m, ReverseMove* rm) {
     return;
   }
   
-  short groundrank = GetColorToMove()==whiteNumber ? 1 : MaxRank;
   const short startfile = m->GetStartFile();
   const short startrank = m->GetStartRank();
   const short targetfile = m->GetTargetFile();
-  const short targetrank = m->GetTargetRank();
+  const short targetrank = m->GetTargetRank();  
+  
   Piece *p = GetPieceOnField(startfile, startrank);
   if (!p) {
     cout << "Error: No Piece to move" << endl;
@@ -567,30 +563,33 @@ void Position::ExecuteMove(Move* m, ReverseMove* rm) {
     return;
   }
   
-//   if (p->GetColor() != GetColorToMove()) 
+  short colorpiece = p->GetColor();
+  short groundrank = colorpiece==whiteNumber ? 1 : MaxRank;
+  
+//   if (colorpiece != GetColorToMove()) 
 //     cout << "Warning: Wrong color to move" << endl;
 
   if (rm) {
     rm->SetFields(targetfile, targetrank, startfile, startrank);
-    rm->SetCastlingShort(CanColorCastle(GetColorToMove(),true));
-    rm->SetCastlingLong(CanColorCastle(GetColorToMove(),false));
+    rm->SetCastlingShort(CanColorCastle(colorpiece,true));
+    rm->SetCastlingLong(CanColorCastle(colorpiece,false));
     rm->SetEnPassantFile(GetEnPassantFile());
   }
   const short movedpiecetype = p->GetType();
   
-  PieceList *activelist = GetColorToMove()==whiteNumber ? white : black;
+  PieceList *activelist = colorpiece==whiteNumber ? white : black;
   if ((movedpiecetype == king) && (startfile == 5) && (startrank == groundrank) && (targetfile == 3 || targetfile == 7)) {
     short rookstartfile = targetfile==3 ? 1 : 8;
     short rooktargetfile = targetfile==3 ? 4 : 6;
     
-    if ((rookstartfile==1 && !IsCastlingPossibleFromPosition(colortomove,false)) || rookstartfile==8 && !IsCastlingPossibleFromPosition(colortomove,true)) {
+    if ((rookstartfile==1 && !IsCastlingPossibleFromPosition(colorpiece,false)) || rookstartfile==8 && !IsCastlingPossibleFromPosition(colorpiece,true)) {
       cout << "Warning: Cannot castle in this position" << endl;
       delete rm;
       rm = 0x0;
       return;
     }
     
-    if ((rookstartfile==1 && !CanColorCastle(colortomove,false)) || rookstartfile==8 && !CanColorCastle(colortomove,true))
+    if ((rookstartfile==1 && !CanColorCastle(colorpiece,false)) || rookstartfile==8 && !CanColorCastle(colorpiece,true))
       cout << "Warning: Castling not allowed" << endl;
     
     Piece *r = GetPieceOnField(rookstartfile,groundrank);
@@ -612,18 +611,18 @@ void Position::ExecuteMove(Move* m, ReverseMove* rm) {
     rm->SetPromotion(true);
   
   if (movedpiecetype == king) {
-    SetColorCastle(colortomove,true,false);
-    SetColorCastle(colortomove,false,false);
+    SetColorCastle(colorpiece,true,false);
+    SetColorCastle(colorpiece,false,false);
   }
   
   if ((movedpiecetype == rook) && (startrank == groundrank) && ((startfile == 1) || (startfile == MaxFile)))
-    SetColorCastle(GetColorToMove(),startfile==1 ? false : true,false);
+    SetColorCastle(colorpiece,startfile==1 ? false : true,false);
   
   enpassantfile = 0;
-  if ((movedpiecetype == pawn) && (abs(targetrank - startrank) == 2) && startrank == groundrank + GetColorToMove()) {
+  if ((movedpiecetype == pawn) && (abs(targetrank - startrank) == 2) && startrank == groundrank + colorpiece) {
     enpassantfile = targetfile;
   }      
-  SetColorToMove(-GetColorToMove());    
+  SetColorToMove(-colorpiece);    
   activelist = 0x0;
   return;
 }

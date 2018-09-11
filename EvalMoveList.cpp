@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "EvalMoveList.h"
 
 EvalMoveList::EvalMoveList(EvalMove* evalmove, EvalMoveList* nextevalmove, bool ownerflag) {
@@ -51,8 +53,10 @@ int EvalMoveList::GetNMoves(int previous) {
 }
 
 void EvalMoveList::WriteOutMoves() {
- if (em) 
+ if (em) {
    em->WriteOutMove();
+   std::cout << std::endl;
+ }
  
  if (next) 
    next->WriteOutMoves();

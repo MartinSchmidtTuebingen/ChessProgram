@@ -149,6 +149,8 @@ Move* Piece::CreateMoveIfPieceCanMoveToField(short targetfile, short targetrank,
           cout << "Position illegal: En passant set, but no pawn on the field " << GetField(targetfile,enpassantrank - GetColor()) << endl;
       }
     }
+    if (m && targetrank==opponentgroundrank)
+      m->SetPromotion(queen);
   }
   if (m && pos->IsCheckedAfterMove(m)) {
     delete m;
@@ -172,7 +174,7 @@ EvalMoveList* Piece::MakeMoveList(Position* pos) {
     case king: 
       if (pos->CanColorCastle(GetColor(),true) && pos->IsCastlingPossibleFromPosition(GetColor(), true))
         eml->AddMove(new Move(5,groundrank,7,groundrank));
-      if (pos->CanColorCastle(GetColor(),false) && pos->IsCastlingPossibleFromPosition(GetColor(), false))
+      if (pos->CanColorCastle(GetColor(),false) && pos->IsCastlingPossibleFromPosition(GetColor(), false)) 
         eml->AddMove(new Move(5,groundrank,3,groundrank));
       maxDistance = 1;
       break;
@@ -208,16 +210,24 @@ EvalMoveList* Piece::MakeMoveList(Position* pos) {
       }
     }
   }
-  else if (GetType()!=noPiece) {
+  else if (GetType() != noPiece) {
     for (int i=start;i<end;i++) {
       int rfile = startfile + filedirections[i];
       int rrank = startrank + rankdirections[i];
       bool free = true;
       int distance=1;
-      while (free && rfile <= MaxFile && rfile >= 1 && rrank <= MaxRank && rrank >= 1 && distance < maxDistance) {
+      while (free && rfile <= MaxFile && rfile >= 1 && rrank <= MaxRank && rrank >= 1 && distance <= maxDistance) {
         Move* m = CreateMoveIfPieceCanMoveToField(rfile,rrank,pos);
-        if (m)
+        if (m) {
           eml->AddMove(m);
+          if (m->GetPromotion()) {
+            for (int j=rook;j<=knight;j++)
+              eml->AddMove(new Move(startfile,startrank,rfile,rrank,m->GetIDofCapturedPiece(),j));
+          }
+        }
+  
+        if (pos->GetPieceOnField(rfile,rrank))
+          free=false;
         
         rfile += filedirections[i];
         rrank += rankdirections[i];
