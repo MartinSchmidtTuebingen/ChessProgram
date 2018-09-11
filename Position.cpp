@@ -9,6 +9,7 @@ using namespace std;
 #include "PieceList.h"
 #include "Move.h"
 #include "ReverseMove.h"
+#include "EvalMoveList.h"
 
 
 Position::Position(PieceList *white, PieceList *black, short colortomove, bool whitecancastleshort, bool whitecancastlelong, bool blackcancastleshort, bool blackcancastlelong, short enpassantfile) {
@@ -67,15 +68,23 @@ void Position::SetUpStartPosition() {
   
   delete board;
   board = new Piece*[MaxFile * MaxRank]; 
+  for (int i=0;i<8;i++) {
+    for (int j=0;j<8;j++)
+      SetBoardPointer(0x0,i+1,j+1);
+  }
   
+  white->SetOwner(true);
   delete white;
   white = new PieceList();
   white->SetUpStartPosition(whiteNumber);
+  white->SetOwner(false);
   SetBoardPointer(white);
 
+  white->SetOwner(true);
   delete black;
   black = new PieceList();
   black->SetUpStartPosition(blackNumber);
+  white->SetOwner(false);
   SetBoardPointer(black);
   return;
 }
@@ -385,17 +394,14 @@ bool Position::IsCheckedAfterMove(Move* m) {
 bool Position::IsMoveLegal(Move* m){
 //   cout << "Attention: Legality only checks at the moment if there is a piece on the start field that has the right color, whether is a piece of the same color on the end field and if the own king is checked after the move" << endl;
   Piece* p = GetPieceOnField(m->GetStartFile(), m->GetStartRank());
-  Piece* cp = GetPieceOnField(m->GetTargetFile(), m->GetTargetRank());
+
   if (!p || p->GetColor() != GetColorToMove())
     return false;
-  else if (cp && (p->GetColor() == cp->GetColor()))
-    return false;
-  else {
-    bool checked=IsCheckedAfterMove(m);
-    if (checked)
-      return false;
-  }
-  return true;
+  
+  EvalMoveList* eml = p->MakeMoveList(this);
+  bool equalmove = eml->Moveequal(m);
+  delete eml;
+  return equalmove;
 }
 
 bool Position::IsMovePromotion(Move* m) {
@@ -627,7 +633,7 @@ void Position::ExecuteMove(Move* m, ReverseMove* rm) {
   return;
 }
 
-EvalMoveList* Position::MakeMoveList() const {
+EvalMoveList* Position::MakeMoveList(){
   PieceList* activelist = GetColorToMove()==whiteNumber ? white : black;
   EvalMoveList* eml = activelist->MakeMoveList(this);
   activelist = 0x0;

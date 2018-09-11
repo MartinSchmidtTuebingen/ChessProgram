@@ -14,7 +14,7 @@ Piece.o : Piece.cpp Piece.h Move.h Evaluation.h Chess.h EvalMoveList.h Position.
 
 PieceList.o : PieceList.cpp PieceList.h Piece.h Move.h Evaluation.h Chess.h EvalMoveList.h Position.h
 
-Position.o : Position.cpp Position.h Piece.h PieceList.h Move.h ReverseMove.h SupportFunctions.h Chess.h
+Position.o : Position.cpp Position.h Piece.h PieceList.h Move.h ReverseMove.h SupportFunctions.h Chess.h EvalMoveList.h
 
 Evaluation.o : Evaluation.cpp Evaluation.h Position.h
 

@@ -54,7 +54,7 @@ public:
   void RetractMove(ReverseMove* m);
   void WriteOutPosition();
   //Making the list of possible moves in this position
-  EvalMoveList* MakeMoveList() const;
+  EvalMoveList* MakeMoveList();
 protected:
   //Capturing a Piece. Should not be visible. Declare as private after testing
   void CapturePiece(Move* m, ReverseMove* rm = 0x0);
