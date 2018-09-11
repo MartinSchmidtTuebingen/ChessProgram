@@ -49,3 +49,12 @@ int EvalMoveList::GetNMoves(int previous) {
   else 
     return previous + em ? 1 : 0;
 }
+
+void EvalMoveList::WriteOutMoves() {
+ if (em) 
+   em->WriteOutMove();
+ 
+ if (next) 
+   next->WriteOutMoves();
+ return;
+}

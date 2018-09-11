@@ -21,7 +21,7 @@ public:
   void SetOwner(bool flag) {owner = flag;};
   bool GameOver() const {if (m) {return false;} else {return true;}};
   float Comparison(EvalMove* emv) {return 0.0;};
-  void WriteOut() const {;};
+  void WriteOutMove() const;
   
 private:
   friend class Test;

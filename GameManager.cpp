@@ -408,7 +408,7 @@ void GameManager::ManageGame(int humancolor) {
       }
       else {
         em = game->GiveBestMoveWithEvaluation(pos, GetDepth());
-        em->WriteOut();
+        em->WriteOutMove();
         m = em->GetMove();
         pos->ExecuteMove(m);
       }

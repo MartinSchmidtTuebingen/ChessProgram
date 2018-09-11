@@ -29,6 +29,7 @@ public:
   bool ClearFromMove();
   EvalMove* GetEvalMove() const {return em;};
   int GetNMoves(int previous = 0);
+  void WriteOutMoves();
 private:
   EvalMove* em;
   EvalMoveList* next;
