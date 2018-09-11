@@ -19,6 +19,7 @@ public:
   void SetPromotion(short flag);
   short GetPromotion() const {return promotion;};
   void WriteOutMove() const;
+  bool Moveequal(Move* m) const;
 private:
   friend class Test;
   short startfile;

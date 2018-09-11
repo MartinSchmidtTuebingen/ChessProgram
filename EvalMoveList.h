@@ -26,6 +26,7 @@ public:
   void Append(EvalMoveList* n) {if (!next) {next = n;} else {next->Append(n);}};
   bool IsEmpty() {return GetNMoves() == 0;};
   float Comparison(EvalMove* emv) const {return em->Comparison(emv);;};
+  bool Moveequal(Move* m) const;
   bool ClearFromMove();
   EvalMove* GetEvalMove() const {return em;};
   int GetNMoves(int previous = 0);

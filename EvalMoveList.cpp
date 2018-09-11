@@ -52,6 +52,18 @@ int EvalMoveList::GetNMoves(int previous) {
     return previous + em ? 1 : 0;
 }
 
+bool EvalMoveList::Moveequal(Move* m) const {
+  bool equalmove = false;
+  if (em)
+    equalmove = em->Moveequal(m);
+  if (equalmove)
+    return true;
+  else {
+    if (next)
+      return next->Moveequal(m);
+  }
+}
+
 void EvalMoveList::WriteOutMoves() {
  if (em) {
    em->WriteOutMove();

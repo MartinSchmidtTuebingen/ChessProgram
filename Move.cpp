@@ -34,3 +34,7 @@ void Move::SetPromotion(short flag) {
 void Move::WriteOutMove() const {
   cout << GetField(GetStartFile(),GetStartRank()) << (GetIDofCapturedPiece() ? "x" : "-") << GetField(GetTargetFile(),GetTargetRank()) << GetPieceShortName(GetPromotion());
 }
+
+bool Move::Moveequal(Move* m) const {
+  return (GetStartFile()==m->GetStartFile() && GetStartRank()==m->GetStartRank() && GetTargetFile()==m->GetTargetFile() && GetTargetRank()==m->GetTargetRank());
+}

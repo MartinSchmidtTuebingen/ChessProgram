@@ -24,3 +24,10 @@ void EvalMove::WriteOutMove() const {
     m->WriteOutMove();
   return;
 }
+
+bool EvalMove::Moveequal(Move* meq) const {
+  if (m && meq)
+    return m->Moveequal(meq);
+  else
+    return false;
+}

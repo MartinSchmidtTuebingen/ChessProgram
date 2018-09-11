@@ -22,7 +22,7 @@ public:
   bool GameOver() const {if (m) {return false;} else {return true;}};
   float Comparison(EvalMove* emv) {return 0.0;};
   void WriteOutMove() const;
-  
+  bool Moveequal(Move* meq) const;
 private:
   friend class Test;
   Move* m;
