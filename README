@@ -1,6 +1,5 @@
 //TODO Write the classes and functions needed for the class ChessGame
-/* Test function Position::IsMoveLegal()
- * Write complete function Piece::MakeEvalMoveList (use own branch CreateMoveList)
+/*
  * Write the method to loop through the position and chess the best moves (a prototype is present, though commented out in ChessGame.cpp
  */
 
