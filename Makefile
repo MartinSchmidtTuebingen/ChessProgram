@@ -16,7 +16,7 @@ PieceList.o : PieceList.cpp PieceList.h Piece.h Move.h Evaluation.h Chess.h Eval
 
 Position.o : Position.cpp Position.h Piece.h PieceList.h Move.h ReverseMove.h SupportFunctions.h Chess.h EvalMoveList.h
 
-Evaluation.o : Evaluation.cpp Evaluation.h Position.h
+Evaluation.o : Evaluation.cpp Evaluation.h Position.h PieceList.h
 
 EvalMove.o : EvalMove.cpp EvalMove.h
 
@@ -30,6 +30,6 @@ GameManager.o : GameManager.cpp GameManager.h Position.h Move.h SupportFunctions
 
 Chess.o : Chess.cpp Chess.h Piece.h PieceList.h Move.h Evaluation.h Position.h GameManager.h
 
-Test.o : Test.cpp Test.h Chess.h Evaluation.h Move.h EvalMove.h EvalMoveList.h ReverseMove.h ReverseMoveStack.h Piece.h PieceList.h Position.h SupportFunctions.h
+Test.o : Test.cpp Test.h Chess.h Evaluation.h Move.h EvalMove.h EvalMoveList.h ReverseMove.h ReverseMoveStack.h Piece.h PieceList.h Position.h SupportFunctions.h ChessGame.h
 
 

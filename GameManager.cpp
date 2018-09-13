@@ -390,9 +390,7 @@ void GameManager::ManageGame(int humancolor) {
     do {
       delete m;
       delete em;
-      em = game->GiveBestMoveWithEvaluation(pos);
-      m = em->GetMove();
-      pos->ExecuteMove(m);
+      game->DoMove();
       movenumber++;
     }
     while (false);
@@ -407,7 +405,7 @@ void GameManager::ManageGame(int humancolor) {
         pos->ExecuteMove(m);
       }
       else {
-        em = game->GiveBestMoveWithEvaluation(pos, GetDepth());
+//         em = game->GiveBestMoveWithEvaluation(pos, GetDepth());
         em->WriteOutMove();
         m = em->GetMove();
         pos->ExecuteMove(m);

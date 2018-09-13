@@ -8,6 +8,7 @@ public:
   void TestPieceFunctions();
   void TestPieceListFunctions();
   void TestPositionFunctions();
+  void TestChessGameFunctions();
 };
 
 

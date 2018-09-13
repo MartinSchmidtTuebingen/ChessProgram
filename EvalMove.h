@@ -10,17 +10,17 @@ public:
   EvalMove(Move* move = 0x0, float evaluation = 0.0, int MovesToFinish = 0, bool stalemate = false, bool owner = true);
   ~EvalMove();
   Move* GetMove() const { return m;};
-  void SetMove(Move* mo) {m = mo;};
+  void SetMove(Move* mo);
   float GetEvaluation() const { return evaluation;};
   void SetEvaluation(float eval) {evaluation = eval;};
   int GetMovesToFinish () const { return MovesToFinish;};
   void SetMovesToFinish(int moves) {MovesToFinish = moves;};
   bool GetStaleMate() const {return stalemate;};
-  void SetStaleMate(bool flag) {stalemate = flag;}
+  void SetStaleMate(bool flag) {stalemate = flag;SetMovesToFinish(0);SetMove(0x0);};
   bool GetOwner() const {return owner;};
   void SetOwner(bool flag) {owner = flag;};
   bool GameOver() const {if (m) {return false;} else {return true;}};
-  float Comparison(EvalMove* emv) {return 0.0;};
+  float Compare(EvalMove* emv) {return 0.0;};
   void WriteOutMove() const;
   bool Moveequal(Move* meq) const;
 private:

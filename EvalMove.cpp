@@ -19,6 +19,13 @@ EvalMove::~EvalMove() {
   m = 0x0;
 }
 
+void EvalMove::SetMove(Move* mo) {
+  if (GetOwner()) 
+    delete m;
+  
+  m=mo; 
+}
+
 void EvalMove::WriteOutMove() const {
   if (m)
     m->WriteOutMove();

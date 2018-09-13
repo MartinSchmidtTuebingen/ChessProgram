@@ -17,6 +17,8 @@ public:
   //Getters
   short GetColorToMove() const {return colortomove;};
   void SetColorToMove(short color);
+  PieceList* GetWhitePieces() {return white;};
+  PieceList* GetBlackPieces() {return black;};
   short GetEnPassantFile() const {return enpassantfile;};
   void SetEnPassantFile(short file) {enpassantfile = file;};
   void SetBoardPointer(Piece *p, short file = 0, short rank = 0);

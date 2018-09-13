@@ -9,6 +9,7 @@ using namespace std;
 #include "PieceList.h"
 #include "Position.h"
 #include "Chess.h"
+#include "ChessGame.h"
 #include "ReverseMoveStack.h"
 #include "ReverseMove.h"
 #include "SupportFunctions.h"
@@ -506,6 +507,38 @@ void Test::TestPositionFunctions() {
   pos = 0x0;
   delete m;
   m = 0x0;
-  cout << endl << endl << "Test Piece: End Test MakeMoveList" << endl << endl;
+  cout << endl << endl << "End Test MakeMoveList" << endl << endl;
+  cout << endl << endl << "End Test Position functions" << endl << endl;
   return;
+}
+
+void Test::TestChessGameFunctions() {
+  cout << endl << "Test Game functions" << endl << endl;
+  cout << endl << "Check StaleMate" << endl;
+  Position* p = new Position();
+  p->SetColorToMove(blackNumber);
+  p->CreatePiece(king,blackNumber,1,1);
+  p->CreatePiece(queen,whiteNumber,2,3);
+  ChessGame* game = new ChessGame(0x0,0x0,p);
+  game->DoMove();
+  delete game;
+  cout << "End check stalemate" << endl;
+  
+  cout << endl << "Check checkmate" << endl;
+  p = new Position();
+  p->SetColorToMove(blackNumber);
+  p->CreatePiece(king,blackNumber,1,1);
+  p->CreatePiece(queen,whiteNumber,2,2);
+  p->CreatePiece(king,whiteNumber,3,3);
+  game = new ChessGame(0x0,0x0,p);
+  game->DoMove();
+  cout << "End check checkmate" << endl;  
+  cout << "Check complete position evaluation" << endl;
+  p->CreatePiece(knight,blackNumber,4,1);
+  game->WriteOutPosition();
+  cout << "End Check complete position evaluation" << endl;
+  
+  delete game;
+  game = 0x0;
+  p = 0x0;
 }

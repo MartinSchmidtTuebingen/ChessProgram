@@ -3,9 +3,9 @@
  * Write the method to loop through the position and chess the best moves (a prototype is present, though commented out in ChessGame.cpp
  */
 
-// (See papers)
+//ATTENTION GameManager needs to be changed to adapt to changes in ChessGame 
 
-//TODO Rewrite Checks in specified branch
+// (See papers)
 
 //TODO Write class evaluation. This class is doing later the evaluation of the positions. As basis, it only evaluates the material. Later possibilities can be included using suggestions of blog readers. The function evaluation also evaluates possible mates for the side who moves and similar things. 
 

@@ -1,24 +1,30 @@
 #ifndef CHESSGAME_H
 #define CHESSGAME_H
 
-class Position;
+#include "Evaluation.h"
+#include "Position.h"
+
 class EvalMove;
-class Evaluation;
+class Move;
 
 class ChessGame {
 public:
-  ChessGame(Evaluation *whiteEvaluation = 0x0, Evaluation *blackEvaluation = 0x0);
+  ChessGame(Evaluation *we = 0x0, Evaluation *be = 0x0, Position* p = 0x0);
   ~ChessGame();
-  EvalMove* GiveBestMoveWithEvaluation(Position* pos, int depth = -1);
   Evaluation* GetWhiteEvaluation() const {return whiteEvaluation;};
-  void SetWhiteEvaluation(Evaluation* eval) {whiteEvaluation = eval;};
+  void SetWhiteEvaluation(Evaluation* eval) {delete whiteEvaluation; whiteEvaluation = eval;};
   Evaluation* GetBlackEvaluation() const {return blackEvaluation;};
-  void SetBlackEvaluation(Evaluation* eval) {blackEvaluation = eval;};
-  
+  void SetBlackEvaluation(Evaluation* eval) {delete blackEvaluation; blackEvaluation = eval;};
+  Position* GetPosition() const {return pos;};
+  void SetPosition(Position* p) {delete pos;pos = p;};  
+  EvalMoveList* GetMoveList();
+  EvalMove* GiveBestMoveWithEvaluation(int depth = -1);
+  void DoMove(Move* m = 0x0);
+  void WriteOutPosition();
 private:
   Evaluation* whiteEvaluation;
   Evaluation* blackEvaluation;
-  
+  Position* pos;
 };
 
 #endif

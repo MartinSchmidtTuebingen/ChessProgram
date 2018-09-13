@@ -10,15 +10,16 @@ int main() {
   Test *t = new Test();
   cout << "Start testing" << endl;
 //   t->TestPieceListFunctions();
-  t->TestPositionFunctions();
+//   t->TestPositionFunctions();
+  t->TestChessGameFunctions();
   delete t;
   t = 0x0;
   cout << "Test finished" << endl;
-  GameManager *game = new GameManager();
-  
-  game->StartGame();	
-  delete game;
-  game = 0x0;
+//   GameManager *game = new GameManager();
+//   
+//   game->StartGame();	
+//   delete game;
+//   game = 0x0;
   
   return 1;
 }
