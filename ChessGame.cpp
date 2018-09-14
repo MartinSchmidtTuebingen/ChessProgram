@@ -6,6 +6,7 @@ using namespace std;
 #include "Evaluation.h"
 #include "Chess.h"
 #include "EvalMoveList.h"
+#include "ReverseMove.h"
 #include "Position.h"
 
 ChessGame::ChessGame(Evaluation* we, Evaluation* be, Position* p) {
@@ -36,6 +37,39 @@ EvalMoveList* ChessGame::GetMoveList() {
   return 0x0;
 }
 
+EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
+  EvalMoveList* movelist = GetMoveList(); 
+  if (!movelist)
+    return 0x0;
+  
+  if (!movelist->IsEmpty()) {
+    if (depth > 0) {
+      EvalMoveList* looper = movelist;
+      do {
+        Move* m = looper->GetMove();
+        if (m) {
+          ReverseMove* rm = new ReverseMove();
+          pos->ExecuteMove(m,rm);
+          EvalMove* em = GiveBestMoveWithEvaluation(pos,depth - 1);
+          looper->TransferEvaluationofNextBestEvalMove(em);
+          pos->RetractMove(rm);
+          delete rm;
+        }
+        looper = looper->GetNext();
+      }
+      while (looper);
+    }
+    else {
+      if (pos->GetColorToMove() == whiteNumber) {
+        evalmove->SetEvaluation(whiteEvaluation->EvaluatePosition(pos));
+      }
+      if (pos->GetColorToMove() == blackNumber) {
+        evalmove->SetEvaluation(blackEvaluation->EvaluatePosition(pos));
+      }
+    }
+  }
+}
+
 EvalMove* ChessGame::GiveBestMoveWithEvaluation(int depth) {
   EvalMoveList* movelist = GetMoveList();
   if (!movelist)
@@ -46,74 +80,35 @@ EvalMove* ChessGame::GiveBestMoveWithEvaluation(int depth) {
     bestmove->SetStaleMate(!pos->IsChecked(pos->GetColorToMove()));
     //Otherwise the evaluation assumes a mate
   }
-//   else {
-//     if (depth > 0) {
-//       Move* m = 0x0;
-//       ReverseMove* rm = 0x0;
-//       for (int n=1;n<=movelist->GetNMoves();i++) {
-//         m->movelist->GetMoveEntry(n);
-//         pos->ExecuteMove(m);
-//       }
-//       do {
-//         m = looper->GetMove();
-//         rm = pos->ExecuteMove(m);
-//         looper->SetEvaluation(GiveBestMoveWithEvaluation(pos, depth-1)->GetEvaluation());
-//         looper->SetMove(m);
-//         pos->ReverseMove(rm);
-//         bool betterorequal = looper->BetterOrEqual(bestevalmove);
-//         int numberOfBestMoves;
-//         if (betterorequal > 0) {
-//           EvalMove* bestevalmove = looper->GetEvalMove();
-//           int numberOfBestMoves = 1;
-//         }
-//         else if (betterorequal >= 0) {
-//           numberOfBestMoves++;
-//         }
-//         else {
-//           looper->ClearFromMove();
-//         }
-//         looper = looper->GetNext();
-//       }
-//       while (looper);
-//       if (numberOfBestMoves = 1) {
-//         evalmove = bestevalmove;
-//       }
-//       else {
-//         int number = GetRandomNumber(numberOfBestMoves);
-//         int i = 1;
-//         looper = movelist;
-//         do {
-//       if (!looper->GetEvalMove()) 
-//         continue;
-//         
-//       if (i == number) {
-//         evalmove = looper->GetEvalMove();
-//         looper->SetOwner(false);
-//         break;
-//       }
-//       i++;
-//       looper = looper->GetNext();
-//         }
-//         while (looper);
-//       }
-//     }
-//     else {
-//       if (pos->GetColorToMove() == whiteNumber) {
-//         evalmove->SetEvaluation(whiteEvaluation->EvaluatePosition(pos));
-//       }
-//       if (pos->GetColorToMove() == blackNumber) {
-//         evalmove->SetEvaluation(blackEvaluation->EvaluatePosition(pos));
-//       }
-//     }
-//   }
+  else {
+    if (depth > 0) {
+      EvalMoveList* looper = movelist;
+      do {
+        Move* m = looper->GetMove();
+        if (m) {
+          ReverseMove* rm = new ReverseMove();
+          pos->ExecuteMove(m,rm);
+          EvalMove* em = GiveBestMoveWithEvaluation(pos,depth - 1);
+          looper->TransferEvaluationofNextBestEvalMove(em);
+          pos->RetractMove(rm);
+          delete rm;
+        }
+        looper = looper->GetNext();
+      }
+      while (looper);
+    }
+    else {
+      if (pos->GetColorToMove() == whiteNumber) {
+        evalmove->SetEvaluation(whiteEvaluation->EvaluatePosition(pos));
+      }
+      if (pos->GetColorToMove() == blackNumber) {
+        evalmove->SetEvaluation(blackEvaluation->EvaluatePosition(pos));
+      }
+    }
+  }
   delete movelist;
   movelist = 0x0;
   return bestmove;
-}
-
-void WriteOutEvaluation() {
-  
-  
 }
 
 void ChessGame::DoMove(Move* m) {
