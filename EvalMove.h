@@ -16,11 +16,12 @@ public:
   int GetMovesToFinish () const { return MovesToFinish;};
   void SetMovesToFinish(int moves) {MovesToFinish = moves;};
   bool GetStaleMate() const {return stalemate;};
-  void SetStaleMate(bool flag) {stalemate = flag;SetMovesToFinish(0);SetMove(0x0);};
+  void SetStaleMate(bool flag) {stalemate = flag; SetMove(0x0);};
   bool GetOwner() const {return owner;};
   void SetOwner(bool flag) {owner = flag;};
   bool GameOver() const {if (m) {return false;} else {return true;}};
   float Compare(EvalMove* emv) {return 0.0;};
+  void TransferEvaluationofNextBestEvalMove(EvalMove* m);
   void WriteOutMove() const;
   bool Moveequal(Move* meq) const;
 private:

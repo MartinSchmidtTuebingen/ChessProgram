@@ -24,7 +24,7 @@ EvalMoveList.o : EvalMoveList.cpp EvalMoveList.h EvalMove.h
 
 ReverseMoveStack.o : ReverseMoveStack.cpp ReverseMoveStack.h 
 
-ChessGame.o : ChessGame.cpp ChessGame.h EvalMove.h Evaluation.h Chess.h EvalMoveList.h Position.h
+ChessGame.o : ChessGame.cpp ChessGame.h EvalMove.h Evaluation.h Chess.h EvalMoveList.h Position.h ReverseMove.h
 
 GameManager.o : GameManager.cpp GameManager.h Position.h Move.h SupportFunctions.h EvalMove.o ChessGame.o
 

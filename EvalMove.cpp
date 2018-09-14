@@ -26,6 +26,11 @@ void EvalMove::SetMove(Move* mo) {
   m=mo; 
 }
 
+void EvalMove::TransferEvaluationofNextBestEvalMove(EvalMove* m) {
+  
+  
+}
+
 void EvalMove::WriteOutMove() const {
   if (m)
     m->WriteOutMove();
