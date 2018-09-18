@@ -1,6 +1,8 @@
 //TODO Write the classes and functions needed for the class ChessGame
 /*
- * Write the method to loop through the position and chess the best moves (a prototype is present, though commented out in ChessGame.cpp
+ * Write methods "WeSetMate()" and "OpponentMates() in EvalMove
+ * Write method OrderList in EvalMoveList
+ * Test method to create a move list and find the best move in ChessGame
  */
 
 //ATTENTION GameManager needs to be changed to adapt to changes in ChessGame 

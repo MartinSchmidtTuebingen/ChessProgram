@@ -25,11 +25,13 @@ public:
   void SetNext(EvalMoveList* n) {next = n;};
   void Append(EvalMoveList* n) {if (!next) {next = n;} else {next->Append(n);}};
   bool IsEmpty() {return GetNMoves() == 0;};
-  float Compare(EvalMove* emv) const {return em->Compare(emv);;};
+  bool IsBetterOrEqual(EvalMove* emv, bool isWhiteMove) const {return em->IsBetterOrEqual(emv, isWhiteMove);};
   bool Moveequal(Move* m) const;
   bool ClearFromMove();
+  void OrderMoveList();
   EvalMove* GetEvalMove() const {return em;};
   int GetNMoves(int previous = 0);
+  void TransferEvaluation(EvalMove* emcomp) {em->TransferEvaluation(emcomp);};
   void WriteOutMoves();
 private:
   EvalMove* em;

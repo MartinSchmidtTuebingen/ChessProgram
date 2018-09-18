@@ -20,8 +20,8 @@ public:
   bool GetOwner() const {return owner;};
   void SetOwner(bool flag) {owner = flag;};
   bool GameOver() const {if (m) {return false;} else {return true;}};
-  float Compare(EvalMove* emv) {return 0.0;};
-  void TransferEvaluationofNextBestEvalMove(EvalMove* m);
+  bool IsBetterOrEqual(EvalMove* em, bool isWhiteMove);
+  void TransferEvaluation(EvalMove* em);
   void WriteOutMove() const;
   bool Moveequal(Move* meq) const;
 private:
