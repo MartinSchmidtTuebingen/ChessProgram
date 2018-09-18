@@ -33,8 +33,8 @@ ChessGame::~ChessGame() {
 EvalMoveList* ChessGame::GetMoveList() {
   if (pos)
     return pos->MakeMoveList();
-  
-  return 0x0;
+  else
+    return 0x0;
 }
 
 EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
@@ -42,72 +42,46 @@ EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
   if (!movelist)
     return 0x0;
   
-  if (!movelist->IsEmpty()) {
-    if (depth > 0) {
-      EvalMoveList* looper = movelist;
-      do {
-        Move* m = looper->GetMove();
-        if (m) {
-          ReverseMove* rm = new ReverseMove();
-          pos->ExecuteMove(m,rm);
-          EvalMove* em = GiveBestMoveWithEvaluation(pos,depth - 1);
-          looper->TransferEvaluationofNextBestEvalMove(em);
-          pos->RetractMove(rm);
-          delete rm;
-        }
-        looper = looper->GetNext();
-      }
-      while (looper);
+  EvalMoveList* looper = movelist;
+  do {
+    Move* m = looper->GetMove();
+    if (m) {
+      EvalMove* em = GiveBestMoveWithEvaluation(depth - 1);
+      looper->TransferEvaluation(em);
+      delete em;
+      pos->RetractMove(rm);
+      delete rm;
     }
-    else {
-      if (pos->GetColorToMove() == whiteNumber) {
-        evalmove->SetEvaluation(whiteEvaluation->EvaluatePosition(pos));
-      }
-      if (pos->GetColorToMove() == blackNumber) {
-        evalmove->SetEvaluation(blackEvaluation->EvaluatePosition(pos));
-      }
-    }
+    looper = looper->GetNext();
   }
+  while (looper);
+
+  return movelist;
 }
 
 EvalMove* ChessGame::GiveBestMoveWithEvaluation(int depth) {
-  EvalMoveList* movelist = GetMoveList();
+  EvalMove* bestmove = new EvalMove();
+  if (depth <= 0) {
+    Evaluation* eval = pos->GetColorToMove()==whiteNumber ? whiteEvaluation : blackEvaluation;
+    bestmove->SetEvaluation(eval->EvaluatePosition(pos));
+    return bestmove;
+  }
+
+  EvalMoveList* movelist = GetEvalMoveList(depth);
   if (!movelist)
     return 0x0;
   
-  EvalMove* bestmove = new EvalMove();
   if (movelist->IsEmpty()) {
     bestmove->SetStaleMate(!pos->IsChecked(pos->GetColorToMove()));
-    //Otherwise the evaluation assumes a mate
+    return bestmove;
   }
-  else {
-    if (depth > 0) {
-      EvalMoveList* looper = movelist;
-      do {
-        Move* m = looper->GetMove();
-        if (m) {
-          ReverseMove* rm = new ReverseMove();
-          pos->ExecuteMove(m,rm);
-          EvalMove* em = GiveBestMoveWithEvaluation(pos,depth - 1);
-          looper->TransferEvaluationofNextBestEvalMove(em);
-          pos->RetractMove(rm);
-          delete rm;
-        }
-        looper = looper->GetNext();
-      }
-      while (looper);
-    }
-    else {
-      if (pos->GetColorToMove() == whiteNumber) {
-        evalmove->SetEvaluation(whiteEvaluation->EvaluatePosition(pos));
-      }
-      if (pos->GetColorToMove() == blackNumber) {
-        evalmove->SetEvaluation(blackEvaluation->EvaluatePosition(pos));
-      }
-    }
-  }
+  
+  movelist->OrderMoveList();
+  bestmove = movelist->GetEvalMove();
+  movelist->SetOwner(false);
+    
   delete movelist;
-  movelist = 0x0;
+  
   return bestmove;
 }
 

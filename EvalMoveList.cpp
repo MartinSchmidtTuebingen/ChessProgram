@@ -64,6 +64,10 @@ bool EvalMoveList::Moveequal(Move* m) const {
   }
 }
 
+void EvalMoveList::OrderMoveList() {
+  return;
+}
+
 void EvalMoveList::WriteOutMoves() {
  if (em) {
    em->WriteOutMove();

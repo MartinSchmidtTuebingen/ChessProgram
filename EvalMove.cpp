@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 #include "EvalMove.h"
 #include "Move.h"
 
@@ -26,14 +29,41 @@ void EvalMove::SetMove(Move* mo) {
   m=mo; 
 }
 
-void EvalMove::TransferEvaluationofNextBestEvalMove(EvalMove* m) {
+void EvalMove::TransferEvaluation(EvalMove* em) {
+  SetEvaluation(-1 * em->GetEvaluation());
+  SetStaleMate(em->GetStaleMate());
+  if (!em->GetMove())
+    SetMovesToFinish(1);
+  if (em->GetMovesToFinish() != 0)
+    SetMovesToFinish(em->GetMovesToFinish() + 1);
+  return;
+}
+
+bool EvalMove::IsBetterOrEqual(EvalMove* em, bool isWhiteMove) {
+  if (WeSetMate() && (!em->WeSetMate() || GetMovesToFinish() <= em->GetMovesToFinish()))
+      return true;
   
+  if (em->OpponentMates() && (!OpponentMates() || em->GetMovesToFinish() <= GetMovesToFinish()))
+    return true;
+    
+  float evalthis = GetStaleMate() ? 0.0 : GetEvaluation();
+  float evalthem = em->GetStaleMate() ? 0.0 : em->GetEvaluation();
   
+  return isWhiteMove ? evalthis >= evalthem : evalthis <= evalthem;
 }
 
 void EvalMove::WriteOutMove() const {
-  if (m)
+  if (m) {
     m->WriteOutMove();
+    if (WeSetMate())
+      cout << "Color to move sets mate in " << GetMovesToFinish() << " moves.";
+    else if (OpponentMates())
+      cout << "Opponent sets mate in " << GetMovesToFinish() << " moves.";    
+    else if (GetStaleMate())
+      cout << "Stalemate in " << GetMovesToFinish() << " moves.";
+    else 
+      cout << "Evaluation of the position after the move is: " << GetEvaluation();
+  }
   return;
 }
 
