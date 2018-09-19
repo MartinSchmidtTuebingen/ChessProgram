@@ -11,6 +11,8 @@ public:
   ~EvalMoveList();
   Move* GetMove() const {return em->GetMove();};
   void SetMove(Move* m) {em->SetMove(m);};
+  EvalMove* GetEvalMove() const {return em;};
+  void SetEvalMove(EvalMove* nem) {em = nem;};
   float GetEvaluation() const {return em->GetEvaluation();};
   void SetEvaluation(float e) {em->SetEvaluation(e);};
   void SetOwner(bool flag) {owner=flag;};
@@ -28,8 +30,7 @@ public:
   bool IsBetterOrEqual(EvalMove* emv, bool isWhiteMove) const {return em->IsBetterOrEqual(emv, isWhiteMove);};
   bool Moveequal(Move* m) const;
   bool ClearFromMove();
-  void OrderMoveList();
-  EvalMove* GetEvalMove() const {return em;};
+  void OrderMoveList(bool isWhiteMove);
   int GetNMoves(int previous = 0);
   void TransferEvaluation(EvalMove* emcomp) {em->TransferEvaluation(emcomp);};
   void WriteOutMoves();

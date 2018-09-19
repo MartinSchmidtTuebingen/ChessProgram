@@ -46,6 +46,8 @@ EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
   do {
     Move* m = looper->GetMove();
     if (m) {
+      ReverseMove* rm = new ReverseMove();
+      pos->ExecuteMove(m,rm);
       EvalMove* em = GiveBestMoveWithEvaluation(depth - 1);
       looper->TransferEvaluation(em);
       delete em;
@@ -76,7 +78,7 @@ EvalMove* ChessGame::GiveBestMoveWithEvaluation(int depth) {
     return bestmove;
   }
   
-  movelist->OrderMoveList();
+  movelist->OrderMoveList(pos->GetColorToMove());
   bestmove = movelist->GetEvalMove();
   movelist->SetOwner(false);
     
