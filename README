@@ -1,7 +1,5 @@
 //TODO Write the classes and functions needed for the class ChessGame
 /*
- * Write methods "WeSetMate()" and "OpponentMates() in EvalMove
- * Write method OrderList in EvalMoveList
  * Test method to create a move list and find the best move in ChessGame
  */
 

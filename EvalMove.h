@@ -24,6 +24,8 @@ public:
   void TransferEvaluation(EvalMove* em);
   void WriteOutMove() const;
   bool Moveequal(Move* meq) const;
+  bool WeSetMate() const {return !GetStaleMate() && (GetMovesToFinish() % 2 == 1);};
+  bool OpponentMates() const {return !GetStaleMate() && GetMovesToFinish() > 0 && (GetMovesToFinish() % 2 == 1);};
 private:
   friend class Test;
   Move* m;

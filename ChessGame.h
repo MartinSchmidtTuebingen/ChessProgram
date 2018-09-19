@@ -18,8 +18,8 @@ public:
   Position* GetPosition() const {return pos;};
   void SetPosition(Position* p) {delete pos;pos = p;};  
   EvalMoveList* GetMoveList();
-  EvalMoveList* GetEvalMoveList();
-  EvalMove* GiveBestMoveWithEvaluation(int depth = -1);
+  EvalMoveList* GetEvalMoveList(int depth);
+  EvalMove* GiveBestMoveWithEvaluation(int dept);
   void DoMove(Move* m = 0x0);
   void WriteOutPosition();
 private:

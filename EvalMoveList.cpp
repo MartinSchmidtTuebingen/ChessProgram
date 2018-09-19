@@ -64,7 +64,24 @@ bool EvalMoveList::Moveequal(Move* m) const {
   }
 }
 
-void EvalMoveList::OrderMoveList() {
+void EvalMoveList::OrderMoveList(bool isWhiteMove) {
+  EvalMove* bestmove = em;
+  EvalMoveList* listknotwithbestmove = 0x0;
+  EvalMoveList* nextevalmove = next;
+  while (nextevalmove) {
+    if (!bestmove->IsBetterOrEqual(nextevalmove->GetEvalMove(),isWhiteMove)) {
+      bestmove = nextevalmove->GetEvalMove();
+      listknotwithbestmove = nextevalmove;
+    }
+    nextevalmove = nextevalmove->GetNext();
+  }
+  if (listknotwithbestmove) {
+    listknotwithbestmove->SetEvalMove(em);
+    SetEvalMove(bestmove);
+  }
+  if (next)
+    next->OrderMoveList(isWhiteMove);
+  
   return;
 }
 
