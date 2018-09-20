@@ -49,6 +49,7 @@ EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
       ReverseMove* rm = new ReverseMove();
       pos->ExecuteMove(m,rm);
       EvalMove* em = GiveBestMoveWithEvaluation(depth - 1);
+      cout << em->GetMovesToFinish() << " " << em->GetStaleMate() << endl;
       looper->TransferEvaluation(em);
       delete em;
       pos->RetractMove(rm);
@@ -65,7 +66,7 @@ EvalMove* ChessGame::GiveBestMoveWithEvaluation(int depth) {
   EvalMove* bestmove = new EvalMove();
   if (depth <= 0) {
     Evaluation* eval = pos->GetColorToMove()==whiteNumber ? whiteEvaluation : blackEvaluation;
-    bestmove->SetEvaluation(eval->EvaluatePosition(pos));
+    bestmove->SetEvaluation(pos->GetColorToMove() * eval->EvaluatePosition(pos));
     return bestmove;
   }
 
@@ -74,6 +75,8 @@ EvalMove* ChessGame::GiveBestMoveWithEvaluation(int depth) {
     return 0x0;
   
   if (movelist->IsEmpty()) {
+    cout << "Läuft" << endl;
+    pos->WriteOutPosition();
     bestmove->SetStaleMate(!pos->IsChecked(pos->GetColorToMove()));
     return bestmove;
   }

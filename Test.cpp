@@ -539,6 +539,22 @@ void Test::TestChessGameFunctions() {
   cout << "End Check complete position evaluation" << endl;
   
   delete game;
+  
+  p = new Position();
+  p->SetColorToMove(whiteNumber);
+  p->CreatePiece(king,whiteNumber,3,3);
+  p->CreatePiece(rook,whiteNumber,3,5);
+  p->CreatePiece(king,blackNumber,1,3);
+  game = new ChessGame(0x0,0x0,p);
+  EvalMoveList* eml = game->GetEvalMoveList(2);
+  eml->WriteOutMoves();
+//   cout << eml->IsEmpty() << endl;
+//   EvalMove* em = game->GiveBestMoveWithEvaluation(1);
+//   cout << em->GetMove() << endl;
+//   em->WriteOutMove();
+  
+  
+  delete game;
   game = 0x0;
   p = 0x0;
 }

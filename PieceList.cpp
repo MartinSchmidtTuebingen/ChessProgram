@@ -240,6 +240,13 @@ float PieceList::GetValuePieces(const Evaluation *eval) const {
 }
 
 EvalMoveList* PieceList::MakeMoveList(Position *pos) const {
+  if (!GetPiece()) {
+    if (next)
+      return next->MakeMoveList(pos);
+    else
+      return 0x0;
+  }
+    
   EvalMoveList *eml = GetPiece()->MakeMoveList(pos);
   if (next) { 
     EvalMoveList* emlnext = next->MakeMoveList(pos);
