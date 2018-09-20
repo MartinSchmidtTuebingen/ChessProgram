@@ -16,7 +16,7 @@ public:
   int GetMovesToFinish () const { return MovesToFinish;};
   void SetMovesToFinish(int moves) {MovesToFinish = moves;};
   bool GetStaleMate() const {return stalemate;};
-  void SetStaleMate(bool flag) {stalemate = flag; SetMove(0x0);};
+  void SetStaleMate(bool flag) {stalemate = flag;};
   bool GetOwner() const {return owner;};
   void SetOwner(bool flag) {owner = flag;};
   bool GameOver() const {if (m) {return false;} else {return true;}};

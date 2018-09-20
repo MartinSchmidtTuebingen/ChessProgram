@@ -9,7 +9,7 @@ class EvalMoveList {
 public:
   EvalMoveList(EvalMove* evalmove = 0x0, EvalMoveList* nextevalmove = 0x0, bool ownerflag = true);
   ~EvalMoveList();
-  Move* GetMove() const {return em->GetMove();};
+  Move* GetMove() const {if (em) {return em->GetMove();}else {return 0x0;}};
   void SetMove(Move* m) {em->SetMove(m);};
   EvalMove* GetEvalMove() const {return em;};
   void SetEvalMove(EvalMove* nem) {em = nem;};
@@ -32,7 +32,7 @@ public:
   bool ClearFromMove();
   void OrderMoveList(bool isWhiteMove);
   int GetNMoves(int previous = 0);
-  void TransferEvaluation(EvalMove* emcomp) {em->TransferEvaluation(emcomp);};
+  void TransferEvaluation(EvalMove* emcomp) {if (em) em->TransferEvaluation(emcomp);};
   void WriteOutMoves();
 private:
   EvalMove* em;

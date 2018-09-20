@@ -8,7 +8,7 @@ Evaluation::Evaluation() {
   bishopvalue = 3.0;
   knightvalue = 3.0;
   pawnvalue = 1.0;
-  calcdepth = 4;
+  calcdepth = 1;
 }
 
 Evaluation::~Evaluation() {

@@ -30,12 +30,16 @@ void EvalMove::SetMove(Move* mo) {
 }
 
 void EvalMove::TransferEvaluation(EvalMove* em) {
+  if (!em)
+    return;
+  
   SetEvaluation(-1 * em->GetEvaluation());
   SetStaleMate(em->GetStaleMate());
   if (!em->GetMove())
     SetMovesToFinish(1);
   if (em->GetMovesToFinish() != 0)
     SetMovesToFinish(em->GetMovesToFinish() + 1);
+  
   return;
 }
 
@@ -55,6 +59,7 @@ bool EvalMove::IsBetterOrEqual(EvalMove* em, bool isWhiteMove) {
 void EvalMove::WriteOutMove() const {
   if (m) {
     m->WriteOutMove();
+    cout << ": ";
     if (WeSetMate())
       cout << "Color to move sets mate in " << GetMovesToFinish() << " moves.";
     else if (OpponentMates())
