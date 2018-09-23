@@ -375,7 +375,7 @@ bool Position::KnightCheck(Piece* k) const {
         continue;
       
       Piece* p = GetPieceOnField(k->GetFile() + i,k->GetRank() + j);
-      return (p && (p->GetColor() != k->GetColor() || p->GetType() == knight));
+      return (p && (p->GetColor() != k->GetColor() && p->GetType() == knight));
     }
   }
   return false;
