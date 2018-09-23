@@ -4,14 +4,11 @@ using namespace std;
 #include "EvalMove.h"
 #include "Move.h"
 
-EvalMove::EvalMove(Move* move, float evaluation, int MovesToFinish, bool stalemate, bool owner) {
-  if (move)
-    m = move;
-  else
-    m = new Move();
+EvalMove::EvalMove(Move* move, float evaluation, int MovesToFinish, GameEnding end, bool owner) {
+  m = move;
   this->evaluation = evaluation;
   this->MovesToFinish = MovesToFinish;
-  this->stalemate = stalemate;
+  gameend = end;
   this->owner = owner;
 }
 
@@ -33,11 +30,10 @@ void EvalMove::TransferEvaluation(EvalMove* em) {
   if (!em)
     return;
   
-  SetEvaluation(-1 * em->GetEvaluation());
-  SetStaleMate(em->GetStaleMate());
-  if (!em->GetMove())
-    SetMovesToFinish(1);
-  if (em->GetMovesToFinish() != 0)
+  SetEvaluation(em->GetEvaluation());
+  SetGameEnd(em->GetGameEnd());
+  
+  if (em->GetGameEnd() != kNoEnd)
     SetMovesToFinish(em->GetMovesToFinish() + 1);
   
   return;
@@ -45,10 +41,16 @@ void EvalMove::TransferEvaluation(EvalMove* em) {
 
 bool EvalMove::IsBetterOrEqual(EvalMove* em, bool isWhiteMove) {
   if (WeSetMate() && (!em->WeSetMate() || GetMovesToFinish() <= em->GetMovesToFinish()))
-      return true;
-  
+    return true;  
+
   if (em->OpponentMates() && (!OpponentMates() || em->GetMovesToFinish() <= GetMovesToFinish()))
     return true;
+  
+  if (em->WeSetMate() && (!WeSetMate() || em->GetMovesToFinish() <= GetMovesToFinish()))
+    return false;  
+
+  if (OpponentMates() && (!em->OpponentMates() || GetMovesToFinish() <= em->GetMovesToFinish()))
+    return false;  
     
   float evalthis = GetStaleMate() ? 0.0 : GetEvaluation();
   float evalthem = em->GetStaleMate() ? 0.0 : em->GetEvaluation();

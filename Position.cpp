@@ -605,7 +605,9 @@ void Position::ExecuteMove(Move* m, ReverseMove* rm) {
       }
       else {
         Move *rookcastlemove = new Move(rookstartfile,groundrank,rooktargetfile,groundrank);
-        DisplacePiece(rookcastlemove);  
+        DisplacePiece(rookcastlemove); 
+        delete rookcastlemove;
+        rookcastlemove = 0x0;
       }
     }
   }

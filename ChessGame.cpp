@@ -8,6 +8,7 @@ using namespace std;
 #include "EvalMoveList.h"
 #include "ReverseMove.h"
 #include "Position.h"
+#include "Move.h"
 
 ChessGame::ChessGame(Evaluation* we, Evaluation* be, Position* p) {
   if (!we)
@@ -39,8 +40,8 @@ EvalMoveList* ChessGame::GetMoveList() {
 
 EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
   EvalMoveList* movelist = GetMoveList(); 
-  if (!movelist)
-    return 0x0;
+  if (!movelist || depth < 0)
+    return movelist;
   
   EvalMoveList* looper = movelist;
   do {
@@ -49,7 +50,6 @@ EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
       ReverseMove* rm = new ReverseMove();
       pos->ExecuteMove(m,rm);
       EvalMove* em = GiveBestMoveWithEvaluation(depth - 1);
-      cout << em->GetMovesToFinish() << " " << em->GetStaleMate() << endl;
       looper->TransferEvaluation(em);
       delete em;
       pos->RetractMove(rm);
@@ -64,20 +64,18 @@ EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
 
 EvalMove* ChessGame::GiveBestMoveWithEvaluation(int depth) {
   EvalMove* bestmove = new EvalMove();
-  if (depth <= 0) {
-    Evaluation* eval = pos->GetColorToMove()==whiteNumber ? whiteEvaluation : blackEvaluation;
-    bestmove->SetEvaluation(pos->GetColorToMove() * eval->EvaluatePosition(pos));
-    return bestmove;
-  }
-
+  
   EvalMoveList* movelist = GetEvalMoveList(depth);
   if (!movelist)
     return 0x0;
   
   if (movelist->IsEmpty()) {
-    cout << "Läuft" << endl;
-    pos->WriteOutPosition();
-    bestmove->SetStaleMate(!pos->IsChecked(pos->GetColorToMove()));
+    bestmove->SetGameEnd(!pos->IsChecked(pos->GetColorToMove()) ? EvalMove::kStaleMate : EvalMove::kMate);
+    return bestmove;
+  }
+  else if (depth < 0) {
+    Evaluation* eval = pos->GetColorToMove()==whiteNumber ? whiteEvaluation : blackEvaluation;
+    bestmove->SetEvaluation(eval->EvaluatePosition(pos));
     return bestmove;
   }
   
@@ -106,6 +104,7 @@ void ChessGame::DoMove(Move* m) {
     else 
       cout << (pos->GetColorToMove() == whiteNumber ? "White" : "Black") << " is " << (bestmove->GetStaleMate() ? "stalemate." : "mate.") << endl;
   }
+  delete m;
 }
 
 void ChessGame::WriteOutPosition() {
@@ -117,7 +116,10 @@ void ChessGame::WriteOutPosition() {
   EvalMoveList* movelist = GetMoveList();
   if (movelist->IsEmpty()) 
     cout << (pos->GetColorToMove() == whiteNumber ? "White" : "Black") << " is " << (!pos->IsChecked(pos->GetColorToMove()) ? "stalemate." : "mate.") << endl;
+  else
+    delete movelist;
   
   cout << "Evaluation according to white Evaluation is: " << whiteEvaluation->EvaluatePosition(pos) << endl;
   cout << "Evaluation according to black Evaluation is: " << blackEvaluation->EvaluatePosition(pos) << endl;
+  return;
 }
