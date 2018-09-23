@@ -1,6 +1,6 @@
 //TODO Write the classes and functions needed for the class ChessGame
 /*
- * Test method to create a move list and find the best move in ChessGame - mate is not seen correctly
+ * FindBestMove works, but memory goes up indefinitely during searching 
  */
 
 //ATTENTION GameManager needs to be changed to adapt to changes in ChessGame 

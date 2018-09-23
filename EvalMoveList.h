@@ -22,7 +22,7 @@ public:
   int GetMovesToFinish() const {return em->GetMovesToFinish();};
   void SetMovesToFinish(int moves) {em->SetMovesToFinish(moves);};
   bool GetStaleMate() const {em->GetStaleMate();};
-  void SetStaleMate(bool isStaleMate) {em->SetStaleMate(isStaleMate);};
+  void SetStaleMate(bool isStaleMate) {if (em) em->SetGameEnd(EvalMove::kStaleMate);};
   EvalMoveList* GetNext() const {return next;};
   void SetNext(EvalMoveList* n) {next = n;};
   void Append(EvalMoveList* n) {if (!next) {next = n;} else {next->Append(n);}};

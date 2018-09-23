@@ -542,18 +542,32 @@ void Test::TestChessGameFunctions() {
   
   p = new Position();
   p->SetColorToMove(whiteNumber);
-  p->CreatePiece(king,whiteNumber,3,3);
-  p->CreatePiece(rook,whiteNumber,3,5);
-  p->CreatePiece(king,blackNumber,1,3);
+  p->CreatePiece(king,whiteNumber,3,2);
+  p->CreatePiece(king,blackNumber,1,5);
+  p->CreatePiece(queen,whiteNumber,3,6);
+  p->WriteOutPosition();
   game = new ChessGame(0x0,0x0,p);
-  EvalMoveList* eml = game->GetEvalMoveList(2);
+  EvalMoveList* eml = game->GetEvalMoveList(5);
+  eml->OrderMoveList(p->GetColorToMove());
   eml->WriteOutMoves();
-//   cout << eml->IsEmpty() << endl;
-//   EvalMove* em = game->GiveBestMoveWithEvaluation(1);
-//   cout << em->GetMove() << endl;
+  cout << endl;
+//   EvalMove* em = game->GiveBestMoveWithEvaluation(5);
 //   em->WriteOutMove();
-  
-  
+//   cout << game->GetWhiteEvaluation()->EvaluatePosition(p) << endl;
+//   EvalMove* em = game->GiveBestMoveWithEvaluation(1);
+//   cout << em->GetGameEnd() << endl;
+//   game->DoMove(em->GetMove());
+//   p->WriteOutPosition();
+//   cout << game->GetWhiteEvaluation()->EvaluatePosition(p) << endl;
+//   cout << endl;
+//   em->WriteOutMove();
+//   cout << endl;
+//   game->DoMove(em->GetMove());
+//   delete eml;
+//   delete em;
+//   eml = game->GetEvalMoveList(1);
+//   eml->OrderMoveList(p->GetColorToMove());
+//   eml->WriteOutMoves();
   delete game;
   game = 0x0;
   p = 0x0;
