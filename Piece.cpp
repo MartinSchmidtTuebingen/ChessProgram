@@ -25,7 +25,9 @@ Piece::Piece(short type, short color, short file, short rank) {
   this->color = color;
   this->file = file;
   this->rank = rank;
-  this->ID = NextID();
+  ID = NextID();
+  if (ID == 0)
+    ID = NextID();
 }
 
 Piece::Piece(const Piece *p) {
@@ -39,18 +41,8 @@ Piece::Piece(const Piece *p) {
 Piece::~Piece() {
 }
 
-short Piece::IsOnField(short searchedfile, short searchedrank) const{
-  if ((file==searchedfile) && (rank==searchedrank)) {
-    if (type == king) {
-      return -ID;
-    }
-    else {
-      return ID;
-    }
-  }
-  else {
-    return 0;
-  }
+bool Piece::IsOnField(short searchedfile, short searchedrank) const{
+  return file==searchedfile && rank==searchedrank; 
 }
 
 float Piece::GetValue(const Evaluation *eval) const {
