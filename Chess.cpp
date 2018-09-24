@@ -11,7 +11,8 @@ int main() {
   cout << "Start testing" << endl;
 //   t->TestPieceListFunctions();
 //   t->TestPositionFunctions();
-  t->TestChessGameFunctions();
+//   t->TestChessGameFunctions();
+  t->TestMemoryConsumption();
   delete t;
   t = 0x0;
   cout << "Test finished" << endl;

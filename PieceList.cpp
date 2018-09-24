@@ -156,16 +156,14 @@ short PieceList::GetType(short ID) const {
 Piece* PieceList::GetPieceOnField(short searchedfile, short searchedrank) const {
   if (searchedfile < 1 || searchedfile > MaxFile || searchedrank < 1 || searchedrank > MaxRank) 
     return 0x0;
-  if (p->IsOnField(searchedfile, searchedrank)) {
+  
+  if (p->IsOnField(searchedfile, searchedrank)) 
     return p;
-  }
   else {
-    if (next) {
+    if (next) 
       return next->GetPieceOnField(searchedfile, searchedrank);
-    }
-    else {
+    else 
       return 0x0;
-    }
   }
 }
 
@@ -202,8 +200,9 @@ void PieceList::DeletePiece(Move *m) {
 }
 
 void PieceList::DeletePiece(short ID) {
-  if (ID == 0)
+  if (ID == 0) 
     return;  
+    
   if (IsPiece(ID)) {
     delete p;
     p = 0x0;

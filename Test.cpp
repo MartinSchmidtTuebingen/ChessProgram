@@ -572,3 +572,18 @@ void Test::TestChessGameFunctions() {
   game = 0x0;
   p = 0x0;
 }
+
+void Test::TestMemoryConsumption() {
+ cout << endl << "Begin Testing Memory consumtion" << endl << endl; 
+ cout << "Test Memory consumption PieceList" << endl;
+ PieceList* pl = new PieceList();
+ pl->SetOwner(true);
+ for (int i=0;i<100000000;i++) {
+  pl->CreatePiece(blackNumber,king,4,5);
+  int id = pl->GetPieceOnField(4,5)->GetID();
+  pl->DeletePiece(id);
+  if (i % 10000000 == 0)
+    cout << id << endl;
+ }
+ cout << "End Test Memory consumption PieceList" << endl;
+}

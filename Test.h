@@ -9,6 +9,7 @@ public:
   void TestPieceListFunctions();
   void TestPositionFunctions();
   void TestChessGameFunctions();
+  void TestMemoryConsumption();
 };
 
 
