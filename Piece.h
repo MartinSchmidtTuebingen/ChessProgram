@@ -31,7 +31,7 @@ public:
   void SetRank(short r) {rank = r;};
   short GetColor() const {return color;};
   //A check if the piece is on a given field
-  short IsOnField(short searchedfile, short searchedrank) const;
+  bool IsOnField(short searchedfile, short searchedrank) const;
   //A check if the piece is the piece the function is looking for
   bool IsPiece(short searchedID) const {return ID==searchedID;};
   //Returns the value of the piece. Constants given in the Evaluation class
