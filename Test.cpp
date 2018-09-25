@@ -1,4 +1,8 @@
 #include <iostream>
+
+
+#include "sys/types.h"
+#include "sys/sysinfo.h"
 using namespace std;
 
 #include "Test.h"
@@ -574,16 +578,28 @@ void Test::TestChessGameFunctions() {
 }
 
 void Test::TestMemoryConsumption() {
- cout << endl << "Begin Testing Memory consumtion" << endl << endl; 
+ cout << endl << "Begin Testing Memory consumtion" << endl << endl; /*
  cout << "Test Memory consumption PieceList" << endl;
  PieceList* pl = new PieceList();
- pl->SetOwner(true);
- for (int i=0;i<100000000;i++) {
+//  pl->SetOwner(true);
+ for (int i=0;i<10;i++) {
   pl->CreatePiece(blackNumber,king,4,5);
   int id = pl->GetPieceOnField(4,5)->GetID();
+  cout << getCurrentMemoryUbuntu() << endl;
   pl->DeletePiece(id);
-  if (i % 10000000 == 0)
-    cout << id << endl;
+  cout << getCurrentMemoryUbuntu() << endl;
  }
- cout << "End Test Memory consumption PieceList" << endl;
+ cout << "End Test Memory consumption PieceList" << endl;*/
+ cout << "Test Memory consumption Position::Execute/Retract Move" << endl;
+ Position* pos = new Position();
+ pos->CreatePiece(whiteNumber,king,1,1);
+ pos->CreatePiece(blackNumber,king,8,8);
+ Move* m = new Move(1,1,2,2);
+ for (int i=0;i<100000000;i++) {
+   ReverseMove* rm = new ReverseMove();
+   pos->ExecuteMove(m,rm);
+   pos->RetractMove(rm);
+   delete rm; 
+//    cout << getCurrentMemoryUbuntu() << endl; 
+ }
 }

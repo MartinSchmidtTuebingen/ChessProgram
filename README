@@ -6,6 +6,7 @@
 //NOTE
 /*  
  * Creating and deleting a piece in a piecelist does not create memory leak
+ * Executing and Retracting a move in Position does not create memory leak
 */
 
 //ATTENTION GameManager needs to be changed to adapt to changes in ChessGame 

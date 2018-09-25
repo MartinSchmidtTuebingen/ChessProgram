@@ -17,5 +17,7 @@ short GetFileFromString(std::string input);
 short GetFileFromSingleString(std::string input);
 short GetRankFromString(std::string input); 
 short GetRankFromSingleString(std::string input);
+int parseLine(char* line);
+int getCurrentMemoryUbuntu();
 
 #endif
