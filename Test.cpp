@@ -551,9 +551,11 @@ void Test::TestChessGameFunctions() {
   p->CreatePiece(queen,whiteNumber,3,6);
   p->WriteOutPosition();
   game = new ChessGame(0x0,0x0,p);
-  EvalMoveList* eml = game->GetEvalMoveList(5);
+  cout << "Läuft " << getCurrentMemoryUbuntu() << endl;
+  EvalMoveList* eml = game->GetEvalMoveList(2);
+  cout << getCurrentMemoryUbuntu() << endl;
   eml->OrderMoveList(p->GetColorToMove());
-  eml->WriteOutMoves();
+//   eml->WriteOutMoves();
   cout << endl;
 //   EvalMove* em = game->GiveBestMoveWithEvaluation(5);
 //   em->WriteOutMove();
@@ -578,28 +580,37 @@ void Test::TestChessGameFunctions() {
 }
 
 void Test::TestMemoryConsumption() {
- cout << endl << "Begin Testing Memory consumtion" << endl << endl; /*
+ cout << endl << "Begin Testing Memory consumtion" << endl << endl; 
  cout << "Test Memory consumption PieceList" << endl;
  PieceList* pl = new PieceList();
-//  pl->SetOwner(true);
- for (int i=0;i<10;i++) {
+ pl->SetOwner(true);
+ int mem = getCurrentMemoryUbuntu();
+ cout << mem << endl;
+ int i=0;
+ while (mem == getCurrentMemoryUbuntu() && i<10e1) {
   pl->CreatePiece(blackNumber,king,4,5);
   int id = pl->GetPieceOnField(4,5)->GetID();
-  cout << getCurrentMemoryUbuntu() << endl;
   pl->DeletePiece(id);
-  cout << getCurrentMemoryUbuntu() << endl;
+  i++;
  }
- cout << "End Test Memory consumption PieceList" << endl;*/
+ cout << getCurrentMemoryUbuntu() << " " << i << endl;
+ cout << "End Test Memory consumption PieceList" << endl;
+ 
  cout << "Test Memory consumption Position::Execute/Retract Move" << endl;
  Position* pos = new Position();
  pos->CreatePiece(whiteNumber,king,1,1);
  pos->CreatePiece(blackNumber,king,8,8);
  Move* m = new Move(1,1,2,2);
- for (int i=0;i<100000000;i++) {
+ i=0;
+ mem = getCurrentMemoryUbuntu();
+ cout << mem << endl;
+ while (mem == getCurrentMemoryUbuntu() && i<10e4) {
    ReverseMove* rm = new ReverseMove();
    pos->ExecuteMove(m,rm);
    pos->RetractMove(rm);
    delete rm; 
-//    cout << getCurrentMemoryUbuntu() << endl; 
+   i++;
  }
+ cout << getCurrentMemoryUbuntu() << " " << i << endl;
+ return;
 }

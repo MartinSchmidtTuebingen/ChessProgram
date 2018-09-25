@@ -9,6 +9,7 @@ using namespace std;
 #include "ReverseMove.h"
 #include "Position.h"
 #include "Move.h"
+#include "SupportFunctions.h"
 
 ChessGame::ChessGame(Evaluation* we, Evaluation* be, Position* p) {
   if (!we)
@@ -39,51 +40,79 @@ EvalMoveList* ChessGame::GetMoveList() {
 }
 
 EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
+  
   EvalMoveList* movelist = GetMoveList(); 
   if (!movelist || depth < 0)
     return movelist;
   
+      
+//   cout << getCurrentMemoryUbuntu() << endl;
   EvalMoveList* looper = movelist;
   do {
     Move* m = looper->GetMove();
     if (m) {
+      
       ReverseMove* rm = new ReverseMove();
       pos->ExecuteMove(m,rm);
+      int mem_old = getCurrentMemoryUbuntu();
       EvalMove* em = GiveBestMoveWithEvaluation(depth - 1);
+      int mem = getCurrentMemoryUbuntu();
       looper->TransferEvaluation(em);
+      
       delete em;
       pos->RetractMove(rm);
       delete rm;
+      
+      if (depth == 1) {
+//         m->WriteOutMove();cout << endl;
+      }
+      if (pos->GetPieceOnField(2,5) && pos->GetPieceOnField(3,7) && depth==0 && mem_old-mem != 0) {
+        cout << mem_old << " " << mem << endl;
+        m->WriteOutMove();cout << endl;
+      }
     }
     looper = looper->GetNext();
   }
   while (looper);
-
+      
+//   cout << getCurrentMemoryUbuntu() << endl << endl;
+//    if (pos->GetPieceOnField(2,5) && pos->GetPieceOnField(3,7) && depth==0)
+//     cout << mem_old << " " << mem << endl;
+  
   return movelist;
 }
 
 EvalMove* ChessGame::GiveBestMoveWithEvaluation(int depth) {
+  int mem_old = getCurrentMemoryUbuntu();
   EvalMove* bestmove = new EvalMove();
   
   EvalMoveList* movelist = GetEvalMoveList(depth);
+  
+  
   if (!movelist)
     return 0x0;
   
   if (movelist->IsEmpty()) {
     bestmove->SetGameEnd(!pos->IsChecked(pos->GetColorToMove()) ? EvalMove::kStaleMate : EvalMove::kMate);
+    delete movelist;
     return bestmove;
   }
   else if (depth < 0) {
     Evaluation* eval = pos->GetColorToMove()==whiteNumber ? whiteEvaluation : blackEvaluation;
     bestmove->SetEvaluation(eval->EvaluatePosition(pos));
+    delete movelist;
+     int mem = getCurrentMemoryUbuntu();
+  if (pos->GetPieceOnField(2,5) && pos->GetPieceOnField(2,8)) {
+    cout << "Läuft " << mem_old << " " << mem << endl;
+  }
     return bestmove;
   }
   
   movelist->OrderMoveList(pos->GetColorToMove());
   bestmove = movelist->GetEvalMove();
   movelist->SetOwner(false);
-    
   delete movelist;
+  
   
   return bestmove;
 }
