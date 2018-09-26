@@ -1,6 +1,6 @@
 //TODO Write the classes and functions needed for the class ChessGame
 /*
- * FindBestMove works, but memory goes up indefinitely during searching 
+ * FindBestMove works, main memory leak found and removed, still some leak remaining 
  */
 
 //NOTE
