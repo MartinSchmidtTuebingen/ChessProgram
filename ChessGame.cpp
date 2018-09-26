@@ -40,13 +40,10 @@ EvalMoveList* ChessGame::GetMoveList() {
 }
 
 EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
-  
-  EvalMoveList* movelist = GetMoveList(); 
+  EvalMoveList* movelist = GetMoveList();
   if (!movelist || depth < 0)
     return movelist;
   
-      
-//   cout << getCurrentMemoryUbuntu() << endl;
   EvalMoveList* looper = movelist;
   do {
     Move* m = looper->GetMove();
@@ -62,32 +59,17 @@ EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
       delete em;
       pos->RetractMove(rm);
       delete rm;
-      
-      if (depth == 1) {
-//         m->WriteOutMove();cout << endl;
-      }
-      if (pos->GetPieceOnField(2,5) && pos->GetPieceOnField(3,7) && depth==0 && mem_old-mem != 0) {
-        cout << mem_old << " " << mem << endl;
-        m->WriteOutMove();cout << endl;
-      }
     }
     looper = looper->GetNext();
   }
   while (looper);
-      
-//   cout << getCurrentMemoryUbuntu() << endl << endl;
-//    if (pos->GetPieceOnField(2,5) && pos->GetPieceOnField(3,7) && depth==0)
-//     cout << mem_old << " " << mem << endl;
   
   return movelist;
 }
 
 EvalMove* ChessGame::GiveBestMoveWithEvaluation(int depth) {
-  int mem_old = getCurrentMemoryUbuntu();
   EvalMove* bestmove = new EvalMove();
-  
   EvalMoveList* movelist = GetEvalMoveList(depth);
-  
   
   if (!movelist)
     return 0x0;
@@ -101,10 +83,6 @@ EvalMove* ChessGame::GiveBestMoveWithEvaluation(int depth) {
     Evaluation* eval = pos->GetColorToMove()==whiteNumber ? whiteEvaluation : blackEvaluation;
     bestmove->SetEvaluation(eval->EvaluatePosition(pos));
     delete movelist;
-     int mem = getCurrentMemoryUbuntu();
-  if (pos->GetPieceOnField(2,5) && pos->GetPieceOnField(2,8)) {
-    cout << "Läuft " << mem_old << " " << mem << endl;
-  }
     return bestmove;
   }
   
@@ -112,8 +90,7 @@ EvalMove* ChessGame::GiveBestMoveWithEvaluation(int depth) {
   bestmove = movelist->GetEvalMove();
   movelist->SetOwner(false);
   delete movelist;
-  
-  
+
   return bestmove;
 }
 
