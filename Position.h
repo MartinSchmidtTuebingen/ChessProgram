@@ -1,6 +1,8 @@
 #ifndef POSITION_H
 #define POSITION_H
 
+#include "EvalMove.h"
+
 class PieceList;
 class Piece;
 class Move;
@@ -36,6 +38,7 @@ public:
   bool IsChecked() const;
   //Checks if the specified color is in a check.
   bool IsChecked(short color);
+  EvalMove::GameEnding GetEnd();
   bool IsMoveLegal(Move* m);
   bool IsCheckedAfterMove(Move* m);
   bool IsMovePromotion(Move* m);

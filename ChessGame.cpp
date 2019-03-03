@@ -41,8 +41,8 @@ EvalMoveList* ChessGame::GetMoveList() {
 
 EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
   EvalMoveList* movelist = GetMoveList();
-  if (!movelist || depth < 0)
-    return movelist;
+  if (!movelist)
+    return 0x0;
   
   EvalMoveList* looper = movelist;
   do {
@@ -69,28 +69,24 @@ EvalMoveList* ChessGame::GetEvalMoveList(int depth) {
 
 EvalMove* ChessGame::GiveBestMoveWithEvaluation(int depth) {
   EvalMove* bestmove = new EvalMove();
-  EvalMoveList* movelist = GetEvalMoveList(depth);
-  
-  if (!movelist)
-    return 0x0;
-  
-  if (movelist->IsEmpty()) {
-    bestmove->SetGameEnd(!pos->IsChecked(pos->GetColorToMove()) ? EvalMove::kStaleMate : EvalMove::kMate);
-    delete movelist;
-    return bestmove;
+  if (depth <= 0) {
+    bestmove->SetGameEnd(pos->GameEnd());
+    if (bestmove->GetGameEnd() == EvalMove::kNoEnd) {
+      Evaluation* eval = pos->GetColorToMove()==whiteNumber ? whiteEvaluation : blackEvaluation;
+      bestmove->SetEvaluation(eval->EvaluatePosition(pos));
+    }
   }
-  else if (depth < 0) {
-    Evaluation* eval = pos->GetColorToMove()==whiteNumber ? whiteEvaluation : blackEvaluation;
-    bestmove->SetEvaluation(eval->EvaluatePosition(pos));
-    delete movelist;
-    return bestmove;
-  }
+  else {
+    EvalMoveList* movelist = GetEvalMoveList(depth);
   
-  movelist->OrderMoveList(pos->GetColorToMove());
-  bestmove = movelist->GetEvalMove();
-  movelist->SetOwner(false);
-  delete movelist;
-
+    if (!movelist)
+      return 0x0;
+ 
+    movelist->OrderMoveList(pos->GetColorToMove());
+    bestmove = movelist->GetEvalMove();
+    movelist->SetOwner(false);
+    delete movelist;
+  }
   return bestmove;
 }
 
@@ -119,13 +115,12 @@ void ChessGame::WriteOutPosition() {
     return;
   }
   pos->WriteOutPosition();
-  EvalMoveList* movelist = GetMoveList();
-  if (movelist->IsEmpty()) 
-    cout << (pos->GetColorToMove() == whiteNumber ? "White" : "Black") << " is " << (!pos->IsChecked(pos->GetColorToMove()) ? "stalemate." : "mate.") << endl;
-  else
-    delete movelist;
-  
-  cout << "Evaluation according to white Evaluation is: " << whiteEvaluation->EvaluatePosition(pos) << endl;
-  cout << "Evaluation according to black Evaluation is: " << blackEvaluation->EvaluatePosition(pos) << endl;
+  EvalMove::GameEnding end = pos->GameEnd();
+  if (end != EvalMove::kNoEnd) 
+    cout << (pos->GetColorToMove() == whiteNumber ? "White" : "Black") << " is " << (end == EvalMove::kStaleMate) ? "stalemate." : "mate.") << endl;
+  else {
+    cout << "Evaluation according to white Evaluation is: " << whiteEvaluation->EvaluatePosition(pos) << endl;
+    cout << "Evaluation according to black Evaluation is: " << blackEvaluation->EvaluatePosition(pos) << endl;
+  }
   return;
 }

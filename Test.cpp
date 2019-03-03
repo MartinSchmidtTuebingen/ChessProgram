@@ -579,7 +579,7 @@ void Test::TestChessGameFunctions() {
   p = 0x0;
 }
 
-void Test::TestMemoryConsumption() {
+void Test::TestMemoryConsumption() {/*
  cout << endl << "Begin Testing Memory consumtion" << endl << endl; 
  cout << "Test Memory consumption PieceList" << endl;
  PieceList* pl = new PieceList();
@@ -612,5 +612,15 @@ void Test::TestMemoryConsumption() {
    i++;
  }
  cout << getCurrentMemoryUbuntu() << " " << i << endl;
+ */
+ Position* pos = new Position();
+ pos->SetColorToMove(blackNumber);
+ pos->CreatePiece(king,whiteNumber,3,2);
+ pos->CreatePiece(queen,whiteNumber,5,1);
+ pos->CreatePiece(king,blackNumber,2,5);
+ int mem_old = getCurrentMemoryUbuntu();
+ EvalMoveList* eml = pos->MakeMoveList();
+ int mem = getCurrentMemoryUbuntu();
+ cout << mem_old << " " << mem << endl;
  return;
 }

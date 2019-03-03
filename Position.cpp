@@ -391,6 +391,17 @@ bool Position::IsCheckedAfterMove(Move* m) {
   return checked;
 }
 
+EvalMove::GameEnding Position::GetEnd() {
+  EvalMoveList* eml = MakeMoveList();
+  EvalMove::GameEnding end = kNoEnd;
+  
+  if (eml->IsEmpty()) 
+    end = (IsChecked(GetColorToMove())) ? EvalMove::kMate : EvalMove::kStaleMate;
+  
+  delete eml;
+  return end;
+}
+
 bool Position::IsMoveLegal(Move* m){
 //   cout << "Attention: Legality only checks at the moment if there is a piece on the start field that has the right color, whether is a piece of the same color on the end field and if the own king is checked after the move" << endl;
   Piece* p = GetPieceOnField(m->GetStartFile(), m->GetStartRank());
